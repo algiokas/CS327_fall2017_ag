@@ -1,0 +1,18 @@
+Alex Giokas
+Com S 327
+Primary Changelog
+
+9/3/2017
+- Created dungeon.h, dungeon.c files
+
+- Created Floor, Room, Duo structs
+
+- Created basic function prototypes for generate_floor(), add_rooms(), add_corridors()
+  and print_floor()
+
+- Added define macros FWIDTH and FHEIGHT to dungeon.c
+
+9/4/2017
+- Added Cell struct and CellType enum
+
+- Implemented 

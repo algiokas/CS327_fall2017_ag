@@ -1,0 +1,54 @@
+Alex Giokas
+Com S 327 Homework 0
+Changelog
+
+Tuesday August 22nd
+- Created sandpile.c
+
+- Added relevant global variables: width, height and world[][]
+
+- implemented initialize_world() to take command line input and salt the world
+
+- implemented print_world() to display the world state to the console
+
+- Implemented main function that initializes and prints initial world state
+
+Thursday August 24th
+- Created queue.c and queue.h
+
+- added standard function prototypes for a queue in queue.h
+
+- attempted to implement basic integer queue, created testqueue.c (not included in assignment)
+
+Tuesday August 29th
+- Completed implementation of queue functions
+
+- queue can read in integers and read them back in correct order, other functions also working 
+
+- Implemented add_sand() functin in sandpile.c to add a single grain of sand
+
+- implemented unstable queue in sandpile.c that stores the positions of any unstable piles
+
+- implemented update_world() in sandpile.c which reads the queue and just decreases pile heigh
+
+- implemented topple_pile() in sandpile.c which reduces the height of a pile by 4 and places
+  1 sand grain in each of the adjacent cells, unless those cells are edges
+
+- update_world() now calls topple pile() and can correctly simulate a single central pile
+
+- after reaching the point where each pile adjacent to the center topples, the entire simulation
+  breaks
+
+Wednesday August 30th
+- fixed add_sand() and topple_pile() so that they only add unstable piles to the queue once per
+  cycle
+
+- print_world() now displays the iteration number of the world at the top of the printout
+
+- created changelog file
+
+- Created Readme file
+
+- note: I created this file after writing the entire assignment so all prior changes are
+  just a simple overview of what order I did things in
+

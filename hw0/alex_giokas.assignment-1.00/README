@@ -1,0 +1,20 @@
+Alex Giokas
+Com S 327 Homework 0
+Readme
+
+Wednesday August 30th
+
+- I regret not having to spoken to someone about the exact spec for this assignment earlier
+  however I found it to be very confusing.
+
+- My simulation simply runs 1000 iterations of the sandpile at 10 iterations per second
+
+- I implemented a simple array based integer queue in a seperate file that tracks the unstable piles
+
+- My confusion mainly arose from figuring out what a single "step" in the simulation is
+
+- In my code, a "step" occurs every time a grain of sand is placed, and all subsequent domino-effect
+  changes are considered part of that same step
+
+- I did not check for stability every step since the way my code is implemented, stability is
+  reached during every step
