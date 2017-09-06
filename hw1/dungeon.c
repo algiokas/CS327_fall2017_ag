@@ -31,7 +31,7 @@
 
     returns: 0 if successful
 */
-int edit_cell(struct Floor *floor, int x_loc, int y_loc, enum CellType input_type, int input_hardn)
+int edit_cell(struct Floor *floor, int x_loc, int y_loc, enum CType input_type, int input_hardn)
 {
     int cellIndex = (FWIDTH * y_loc) + x_loc;
     floor->map[cellIndex].type = input_type;
@@ -132,7 +132,6 @@ int add_rooms(struct Floor *floor)
     printf("Adding Rooms...");
     double floorsize = floor->width * floor->height;
     double freespace = floorsize; //the total amount of free space within which to place rooms
-
     int roomIter = 0;
     struct Room *newRoom; //blank room that we can fill with data and pass to functions
     newRoom = (Room *) malloc(sizeof(Room));
@@ -174,7 +173,7 @@ int add_corridors(struct Floor *floor)
     return 0;
 }
 
-/*  Function: init_floor
+/*  Function: init_floor 
     --------------------
     Initalizes a floor pointer by setting starting values and allocating memory for
     pointer members
@@ -223,7 +222,7 @@ void print_floor(struct Floor *floor)
         printf("-");
     }
     printf("\n");
-    struct Cell *cell = (struct Cell*) malloc(sizeof(cell));
+    struct Cell *cell = (struct Cell*) malloc(sizeof(struct Cell));
     for (col = 0; col < FHEIGHT; col++) {
         printf("|");
         for (row = 0; row < FWIDTH; row++) {
