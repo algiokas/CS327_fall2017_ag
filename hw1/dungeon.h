@@ -4,13 +4,13 @@
 
 
 //A simple struct to store two integers together
-typedef struct Duo {
+struct Duo {
     int x;
     int y;
-} Duo;
+};
 
 //enumerates possible cell types
-enum type CellType {
+enum CellType {
     immutable;
     rock;
     room;
@@ -21,20 +21,20 @@ enum type CellType {
 //properties in the future. hardness is a property of all cells, however only rock has 
 //variable hardness, the hardness of open cells (room,corridor) is 0 and the hardness of immutable
 //cells is 11
-typedef struct Cell {
+struct Cell {
     CType type;
     int hardness;
 };
 
 //encapsulates a room, loc is the location of the top-left corner of the room
 //dims describes the dimensions (width, height)
-typedef struct Room {
+struct Room {
     Duo loc;
     Duo dims;
 };
 
 //A floor is an 80x21 map which is a single layer of the dungeon
-typedef struct Floor {
+struct Floor {
     int width;
     int height;
     int numRooms;
