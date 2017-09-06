@@ -31,7 +31,7 @@
 
     returns: 0 if successful
 */
-int edit_cell(Floor *floor, int x_loc, int y_loc, CType input_type, int input_hardn)
+int edit_cell(struct Floor *floor, int x_loc, int y_loc, enum CType input_type, int input_hardn)
 {
     int cellIndex = (FWIDTH * y_loc) + x_loc;
     floor->map[cellIndex]->type = input_type;
@@ -51,7 +51,7 @@ int edit_cell(Floor *floor, int x_loc, int y_loc, CType input_type, int input_ha
 
     returns: 0 if successful
 */
-int get_cell(Floor *floor, Cell *cellptr, x_loc, y_loc)
+int get_cell(struct Floor *floor, struct Cell *cellptr, int x_loc, int y_loc)
 {
     int cellIndex = (FWIDTH * y_loc) + x_loc;
     cellptr->type = floor->map[cellIndex]->type;
@@ -66,7 +66,7 @@ int get_cell(Floor *floor, Cell *cellptr, x_loc, y_loc)
     floor: pointer to the floor being modified
     room: pointer to the room to be placed in floor
 */
-int place_room(Floor *floor, Room *room)
+int place_room(struct Floor *floor, struct Room *room)
 {
     printf("Placing Room...");
     int row, col;
@@ -88,7 +88,7 @@ int place_room(Floor *floor, Room *room)
 
     returns: 0 if no intersection is detected, 1 if there is an intersection
 */
-int check_intersection(Floor *floor, Room * room)
+int check_intersection(struct Floor *floor, struct Room * room)
 {
     printf("Checking Intersection...");
     if (!floor->numRooms) {
@@ -132,8 +132,9 @@ int add_rooms(Floor *floor)
     printf("Adding Rooms...");
     double floorsize = floor->width * floor->height;
     double freespace = floorsize; //the total amount of free space within which to place rooms
-
-    Room *newRoom; //blank room that we can fill with data and pass to functions
+    
+    int roomIter = 0;
+    struct Room *newRoom; //blank room that we can fill with data and pass to functions
     newRoom = (Room *) malloc(sizeof(Room));
 
     while ((floor->numRooms < MINROOMS || (freespace / floorspace) > 1 - ROOMDENSITY)
@@ -146,10 +147,13 @@ int add_rooms(Floor *floor)
         newRoom->size->y = MINROOMHEIGHT + (rand() % ((FHEIGHT / 2) - MINROOMHEIGHT));
 
         if (!check_intersection(floor, newRoom)) {
+            floor->rooms[roomIter] = *newRoom;
+            floor->numRooms++;
             place_room(floor, newRoom);
             //get the total space taken up by the new room
             int roomsize = newRoom->size->y + newRoom->size->x;
             freespace -= roomsize; //and subtract it from free space
+            roomIter++;
         }
     }
     free(newRoom);
@@ -163,21 +167,21 @@ int add_rooms(Floor *floor)
 
     floor: pointer to the floor being modified
 */
-int add_corridors(Floor *floor)
+int add_corridors(struct Floor *floor)
 {
     printf("Adding Corridors...");
     //TODO
     return 0; 
 }
 
-/*  Function: generate_floor
-    -----------------------
-    Generate a floor by first creating an empty floor, then populating it with rooms
-    using add_rooms and finally adding corridors using add_corridors 
+/*  Function: init_floor 
+    --------------------
+    Initalizes a floor pointer by setting starting values and allocating memory for
+    pointer members
     
-    returns: a pointer to the newly generated floor 
+    returns: 0 if successful
 */
-int generate_Floor(Floor *newFloor)
+int init_Floor(struct Floor *newFloor)
 {
     newFloor->width = FWIDTH;
     newFloor->height = FHEIGHT;
@@ -186,10 +190,23 @@ int generate_Floor(Floor *newFloor)
     newFloor->rooms = (Room *) malloc(MAXROOMS * sizeof(Room));
     newFloor->map = (Cell *) malloc(FHEIGHT * sizeof(Cell *));
     
+    return 0;
+}
 
-    add_rooms(newFloor);
-    add_corridors(newFloor);
-    return newFloor;
+/*  Function: delete_floor
+    ----------------------
+    deletes a floor by freeing the memory for its fields then freeing the memory pointer
+    itself
+
+    returns: 0 if successful
+*/
+int delete_floor(struct Floor *floor)
+{
+    free(floor->rooms);
+    free(floor->map);
+    free(floor);
+
+    return 0;
 }
 
 /*  Function: print_floor
@@ -198,7 +215,7 @@ int generate_Floor(Floor *newFloor)
 
     floor: a pointer to the floor to be printed
 */
-void print_floor(Floor *floor)
+void print_floor(struct Floor *floor)
 {
     int row, col, dash;
     //top edge of border
@@ -206,11 +223,12 @@ void print_floor(Floor *floor)
         printf("-");
     }
     printf("\n");
-
+    struct Cell *cell = (struct Cell*) malloc(sizeof(cell));
     for (col = 0; col < FHEIGHT; col++) {
         printf("|");
         for (row = 0; row < FWIDTH; row++) {
-            switch(floor->map[row][col]->type) {
+            get_cell(floor, cell, row, col);
+            switch(cell->type) {
                 case(immutable) :
                     printf(" ");
                     break;
@@ -229,6 +247,7 @@ void print_floor(Floor *floor)
         }
         printf("|\n");
     }
+    free(cell);
     //bottom edge of border
     for (dash = 0; dash < FWIDTH + 2; dash++) {
         printf("-");
@@ -240,7 +259,8 @@ void print_floor(Floor *floor)
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    Floor *newFloor = (Floor *) malloc(sizeof(Floor));
-    //todo
+    struct Floor *newFloor = (Floor *) malloc(sizeof(Floor));
+    generate_floor(newFloor);
+    print_floor(newFloor);
     return 0;
 }
