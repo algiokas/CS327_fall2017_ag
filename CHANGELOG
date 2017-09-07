@@ -65,4 +65,28 @@ Primary Changelog
 - Defined and implemented a delete_floor() function that takes a floor pointer and frees the
   memory allocated for that pointer and its fields
 
--
+- First test of program, add_corridors not yet implemented, program prints the frame but
+  map output is blank
+
+- created debug_floor function to output all the members of a floor other than its map (which 
+  is printed by print_floor())
+
+- modified print_floor() to print the correct characters for each type of cell
+
+- fixed errors in edit_cell() where the hardness value of the edited cell was being set to
+  a CellType rather than the hardness
+
+- fixed similar error in get_cell() where the output cell pointer hardness was being set to a 
+  CellType
+
+- output is now fully functional, but room generation behavior is undesired
+
+- fixed an error in add_rooms() where the maximum size of a room was causing rooms to go off
+  the edge of the map.
+
+- fixed an error in check_collision() where rooms could be detected as not colliding if one room
+  started, and ended outside another room
+
+- Dungeon initialization and room generation are fully functional, corridor generation is 
+  not implemented:wq
+  
