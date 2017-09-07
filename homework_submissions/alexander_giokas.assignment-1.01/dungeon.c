@@ -8,6 +8,9 @@
 
 #include "dungeon.h"
 
+#define min(a, b) ((a) < (b)) ? (a) : (b)
+#define max(a, b) ((a) > (b)) ? (a) : (b)
+
 #define FWIDTH  80 //floor width
 #define FHEIGHT 21 //floor height
 
@@ -178,85 +181,55 @@ int draw_path(struct Floor *floor, struct Duo start, struct Duo end)
 {
     printf("Drawing path from (%d, %d) to (%d, %d)...\n", start.x, start.y, end.x, end.y);
     int row, col;
-    int rowOrCol = rand() & 1;
+    int rowOrCol = (rand() % 2);
     struct Cell *tempCell = (struct Cell *) malloc(sizeof(struct Cell));
 
     int rowMin, rowMax, colMin, colMax;
     if (start.x == end.x) {
         rowMin = rowMax = start.x;
     } else {
-        if (start.x < end.x) {
-            rowMin = start.x;
-            rowMax = end.x;
-        } else {
-            rowMin = end.x;
-            rowMax = start.x;
-        }
+        rowMin = min(start.x, end.x);
+        rowMax = max(start.x, end.x);
     }
     if (start.y == end.y) {
-        colMin = colMax = start.y;
+        rowMin = rowMax = start.x;
     } else {
-        if (start.y < end.y) {
-            colMin = start.y;
-            colMax = end.y;
-        } else {
-            colMin = end.y;
-            colMax = start.y;
-        }
+        colMin = min(start.y, end.y);
+        colMax = max(start.y, end.y);
     }
-    printf("rowOrCol: %d\n", rowOrCol);
     if (!rowOrCol) {
-        printf("0 Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMin, rowMax, colMin);
+        printf("Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMin, rowMax, colMin);
         for (row = rowMin; row < rowMax; row++) {
             get_cell(floor, tempCell, row, colMin);
             if (tempCell->type == rock_c) {
                 edit_cell(floor, row, colMin, corridor_c, 0);
             }
         }
-        if (colMin == start.y) {
-            printf("0A Drawing Path from (%d, %d) to (%d, %d)\n", rowMax, colMin, rowMax, colMax);
-            for (col = colMin; col < colMax; col++) {
-                get_cell(floor, tempCell, rowMax, col);
-                if (tempCell->type == rock_c) {
-                    edit_cell(floor, rowMax, col, corridor_c, 0);
-                }
-            }
-        } else {
-            printf("0B Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMin, rowMin, colMax);
-            for (col = colMin; col < colMax; col++) {
-                get_cell(floor, tempCell, rowMin, col);
-                if (tempCell->type == rock_c) {
-                    edit_cell(floor, rowMin, col, corridor_c, 0);
-                }
+ 
+        printf("Drawing Path from (%d, %d) to (%d, %d)\n", rowMax, colMin, rowMax, colMax);
+        for (col = colMin; col < colMax; col++) {
+            get_cell(floor, tempCell, rowMax, col);
+            if (tempCell->type == rock_c) {
+                edit_cell(floor, rowMax, col, corridor_c, 0);
             }
         }
     } else {
-        printf("1 Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMin, rowMin, colMax);
+        printf("Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMin, rowMin, colMax);
         for (col = colMin; col < colMax; col++) {
             get_cell(floor, tempCell, rowMin, col);
             if (tempCell->type == rock_c) {
                 edit_cell(floor, rowMin, col, corridor_c, 0);
             }
         }
-        if (rowMin == start.x) {
-            printf("1A Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMax, rowMax, colMax);
-            for (row = rowMin; row < rowMax; row++) {
-                get_cell(floor, tempCell, row, colMax);
-                if (tempCell->type == rock_c) {
-                    edit_cell(floor, row, colMax, corridor_c, 0);
-                }
-            }
-        } else {
-            printf("1B Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMin, rowMax, colMin);
-            for (row = rowMin; row < rowMax; row++) {
-                get_cell(floor, tempCell, row, colMin);
-                if (tempCell->type == rock_c) {
-                    edit_cell(floor, row, colMin, corridor_c, 0);
-                }
+        printf("Drawing Path from (%d, %d) to (%d, %d)\n", rowMin, colMax, rowMax, colMax);
+        for (row = rowMin; row < rowMax; row++) {
+            get_cell(floor, tempCell, row, colMax);
+            if (tempCell->type == rock_c) {
+                edit_cell(floor, row, colMax, corridor_c, 0);
             }
         }
     }
-return 0;
+    return 0;
 }
 
 
@@ -417,8 +390,8 @@ int main(int argc, char *argv[])
     init_floor(newFloor);
     add_rooms(newFloor);
     add_corridors(newFloor);
-    //system("clear");
-    debug_floor(newFloor);
+    system("clear");
+    //debug_floor(newFloor);
     print_floor(newFloor);
     printf("Press Enter to Exit:\n");
     getchar();

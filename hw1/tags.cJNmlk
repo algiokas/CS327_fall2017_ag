@@ -1,0 +1,71 @@
+HEAP_H	heap.h	4;"	d
+HeapNode	heap.h	/^struct HeapNode {$/;"	s
+priority	heap.h	/^    int priority;$/;"	m	struct:HeapNode
+x	heap.h	/^    int x;$/;"	m	struct:HeapNode
+y	heap.h	/^    int y;$/;"	m	struct:HeapNode
+Heap	heap.h	/^struct Heap {$/;"	s
+nodes	heap.h	/^    struct HeapNode *nodes;$/;"	m	struct:Heap	typeref:struct:Heap::HeapNode
+capacity	heap.h	/^    int capacity;$/;"	m	struct:Heap
+size	heap.h	/^    int size;$/;"	m	struct:Heap
+init_heap	heap.h	/^int init_heap(struct Heap *newHeap, int capacity);$/;"	p
+delete_heap	heap.h	/^int delete_heap(struct Heap *toDelete);$/;"	p
+insert	heap.h	/^int insert(struct Heap *heap, int prio, int x, int y); $/;"	p
+remove_min	heap.h	/^int remove_min(struct Heap *heap, struct Duo* minData);$/;"	p
+LEFT_CHILD	heap.c	5;"	d	file:
+RIGHT_CHILD	heap.c	6;"	d	file:
+PARENT	heap.c	7;"	d	file:
+init_heap	heap.c	/^int init_heap(struct Heap *newHeap, int capacity)$/;"	f
+delete_heap	heap.c	/^int delete_heap(struct Heap *toDelete)$/;"	f
+insert	heap.c	/^int insert(struct Heap *heap, int prio, int x_data, int y_data) $/;"	f
+remove_min	heap.c	/^int remove_min(struct Heap *heap, void *data)$/;"	f
+DUNGEON_H	dungeon.h	3;"	d
+Duo	dungeon.h	/^struct Duo {$/;"	s
+x	dungeon.h	/^    int x;$/;"	m	struct:Duo
+y	dungeon.h	/^    int y;$/;"	m	struct:Duo
+CellType	dungeon.h	/^enum CellType {$/;"	g
+immutable_c	dungeon.h	/^    immutable_c,$/;"	e	enum:CellType
+rock_c	dungeon.h	/^    rock_c,$/;"	e	enum:CellType
+room_c	dungeon.h	/^    room_c,$/;"	e	enum:CellType
+corridor_c	dungeon.h	/^    corridor_c$/;"	e	enum:CellType
+Cell	dungeon.h	/^struct Cell {$/;"	s
+type	dungeon.h	/^    enum CellType type;$/;"	m	struct:Cell	typeref:enum:Cell::CellType
+hardness	dungeon.h	/^    int hardness;$/;"	m	struct:Cell
+Room	dungeon.h	/^struct Room {$/;"	s
+loc	dungeon.h	/^    struct Duo loc;$/;"	m	struct:Room	typeref:struct:Room::Duo
+dims	dungeon.h	/^    struct Duo dims;$/;"	m	struct:Room	typeref:struct:Room::Duo
+Floor	dungeon.h	/^struct Floor {$/;"	s
+width	dungeon.h	/^    int width;$/;"	m	struct:Floor
+height	dungeon.h	/^    int height;$/;"	m	struct:Floor
+numRooms	dungeon.h	/^    int numRooms;$/;"	m	struct:Floor
+rooms	dungeon.h	/^    struct Room *rooms;$/;"	m	struct:Floor	typeref:struct:Floor::Room
+map	dungeon.h	/^    struct Cell *map; \/\/this will be a 2D array but we want memory allocated in a contiguous block$/;"	m	struct:Floor	typeref:struct:Floor::Cell
+edit_cell	dungeon.h	/^int edit_cell(struct Floor *floor, int x_loc, int y_loc, enum CellType input_type, int input_hardn);$/;"	p
+get_cell	dungeon.h	/^int get_cell(struct Floor *floor, struct Cell *cellptr, int x_loc, int y_loc);$/;"	p
+place_room	dungeon.h	/^int place_room(struct Floor *floor, struct Room *room);$/;"	p
+check_intersection	dungeon.h	/^int check_intersection(struct Floor *floor, struct Room * room);$/;"	p
+add_rooms	dungeon.h	/^int add_rooms(struct Floor *floor);$/;"	p
+add_corridors	dungeon.h	/^int add_corridors(struct Floor *floor);$/;"	p
+init_floor	dungeon.h	/^int init_floor(struct Floor *newFloor);$/;"	p
+delete_floor	dungeon.h	/^int delete_floor(struct Floor *floor);$/;"	p
+print_floor	dungeon.h	/^void print_floor(struct Floor *floor);$/;"	p
+min	dungeon.c	11;"	d	file:
+max	dungeon.c	12;"	d	file:
+FWIDTH	dungeon.c	14;"	d	file:
+FHEIGHT	dungeon.c	15;"	d	file:
+MINROOMS	dungeon.c	17;"	d	file:
+MAXROOMS	dungeon.c	18;"	d	file:
+MINROOMWIDTH	dungeon.c	19;"	d	file:
+MINROOMHEIGHT	dungeon.c	20;"	d	file:
+ROOMDENSITY	dungeon.c	21;"	d	file:
+edit_cell	dungeon.c	/^int edit_cell(struct Floor *floor, int x_loc, int y_loc, enum CellType input_type, int input_hardn)$/;"	f
+get_cell	dungeon.c	/^int get_cell(struct Floor *floor, struct Cell *cellptr, int x_loc, int y_loc)$/;"	f
+place_room	dungeon.c	/^int place_room(struct Floor *floor, struct Room *room)$/;"	f
+check_intersection	dungeon.c	/^int check_intersection(struct Floor *floor, struct Room * room)$/;"	f
+add_rooms	dungeon.c	/^int add_rooms(struct Floor *floor)$/;"	f
+draw_path	dungeon.c	/^int draw_path(struct Floor *floor, struct Duo start, struct Duo end)$/;"	f
+add_corridors	dungeon.c	/^int add_corridors(struct Floor *floor)$/;"	f
+init_floor	dungeon.c	/^int init_floor(struct Floor *newFloor)$/;"	f
+delete_floor	dungeon.c	/^int delete_floor(struct Floor *floor)$/;"	f
+print_floor	dungeon.c	/^void print_floor(struct Floor *floor)$/;"	f
+debug_floor	dungeon.c	/^int debug_floor(struct Floor *floor) {$/;"	f
+main	dungeon.c	/^int main(int argc, char *argv[])$/;"	f

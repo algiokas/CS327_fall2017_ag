@@ -1,0 +1,95 @@
+Alex Giokas
+Com S 327
+Primary Changelog
+
+9/3/2017 -----------------------------
+- Created dungeon.h, dungeon.c files
+
+- Created Floor, Room, Duo structs
+
+- Created basic function prototypes for generate_floor(), add_rooms(), add_corridors()
+  and print_floor()
+
+- Added define macros FWIDTH and FHEIGHT to dungeon.c
+
+- Added comments for all current structs and functions
+
+9/4/2017 -----------------------------
+- Added Cell struct and CellType enum
+
+- Implemented generate_floor() function to set a floor pointer to basic values and allocate space
+  for pointer members
+
+- Started to Implement add_rooms() function by creating variables for total size of a floor
+  and the amount of free space available on a floor,
+
+- Added main loop to add_rooms() which randomly generates locations and sizes for rooms
+
+- defined MINROOMS, MAXROOMS, and ROOMDENSITY to control the number and total size of rooms on floor
+
+- Created check_intersection() and place_room() prototypes in dungeon.c
+
+9/5/2017 -----------------------------
+- Implemented place_room() to encapsulate the process of modifying a rectangular region of
+  a floor's map to contain room tiles
+
+- Implemented check_intersection() to encapsulate the process of checking whether a new room
+  would "fit" on the floor without intersecting any other rooms
+
+- Modified add_rooms() so that, after randomly generating a location and size for a room, it
+  checks if that room intersects any other rooms, then adds it to the room array of the floor
+  and places the room on the floor's map. If the random values generated for a new room result
+  in an invalid room, those values are simply discarded.
+
+- Created empty main method that returns 0, then added srand(time(NULL)); to seed the RNG
+
+- Modified the comment structure of all function declarations and implementations in dungeon.c
+  and dungeon.h to be consistent
+
+9/6/2017 -----------------------------
+- Implemented print_floor() to print the map of a floor to console
+
+- Modified the map member of struct Floor to be a single pointer rather than a double pointer,
+  also changed the corresponding malloc in generate_floor()
+
+- Declared and implemented complementary edit_cell() and get_cell() methods which encapsulate
+  the pointer arithmetic required to treat a 1D map array as 2D.
+
+- changed all existing calls to "floor->map[x][y]" to the appropriate edit_cell() or get_cell() calls  
+- Removed "typedef" from all structs in dungeon.h and edited all declaration of struct variables
+  to have the "struct" keyword
+
+- Changed generate_floor() to init_floor(), init_floor now only handles initial values
+  and allocating space for floor members. add_rooms() and add_corridors() now run in main
+
+- Defined and implemented a delete_floor() function that takes a floor pointer and frees the
+  memory allocated for that pointer and its fields
+
+- First test of program, add_corridors not yet implemented, program prints the frame but
+  map output is blank
+
+- created debug_floor function to output all the members of a floor other than its map (which 
+  is printed by print_floor())
+
+- modified print_floor() to print the correct characters for each type of cell
+
+- fixed errors in edit_cell() where the hardness value of the edited cell was being set to
+  a CellType rather than the hardness
+
+- fixed similar error in get_cell() where the output cell pointer hardness was being set to a 
+  CellType
+
+- output is now fully functional, but room generation behavior is undesired
+
+- fixed an error in add_rooms() where the maximum size of a room was causing rooms to go off
+  the edge of the map.
+
+- fixed an error in check_collision() where rooms could be detected as not colliding if one room
+  started, and ended outside another room
+
+- Dungeon initialization and room generation are fully functional, corridor generation is 
+  not implemented
+
+- Deleted function comments from dungeon.h, function comments remain in dungeon.c
+
+
