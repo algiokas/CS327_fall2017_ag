@@ -87,6 +87,29 @@ Primary Changelog
 - fixed an error in check_collision() where rooms could be detected as not colliding if one room
   started, and ended outside another room
 
-- Dungeon initialization and room generation are fully functional, corridor generation is 
-  not implemented:wq
-  
+- Dungeon initialization and room generation are fully functional
+
+- Deleted function comments from dungeon.h, function comments remain in dungeon.c
+
+- Added basic corridor generation. Uses straight line horizontal and verticacl paths from 
+  the centroid of each room to the next, randomly moving in either the x or the y direction first.
+
+- Currently the dungeon is not guarranteed to be connected, somtimes the generation
+  leaves a room disconnected
+
+9/10/2017
+---------------------
+- Created heap.h and heap.c (later renamed pqueue.h and pqueue.c).
+
+- Laid out basic heap structure in pqueue.h. Node struct, containing a priority and a void pointer
+  and heap struct with a dynamic array of nodes, an element size, capacity and size member.
+
+- Created prototypes for basic functions: init_heap(), delete_heap(), insert(), remove_min()
+
+- Implemented init_heap() and delete_heap() in heap.c
+
+- Started to implement insert()
+
+9/11/2017
+---------------------
+

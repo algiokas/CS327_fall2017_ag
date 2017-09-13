@@ -1,0 +1,18 @@
+Alex Giokas
+Com S 327
+Homework 1 Readme
+
+- At time of writing this, room generation and dungeon display is working, corridor generation
+  is not working
+
+- In my implementation, the dungeon is made up of multiple floors. Each generated map represents a
+  single floor. In the future I plan to have a dungeon struct that stores multiple floors
+
+- I added an upper limit of 15 to the number of rooms that can be in a dungeon. I also implemented
+  the "generate rooms until at least 7% of the dungeon is filled" suggestion from the spec. 
+  In practice the number of rooms rarely reaches 15, and usually hovers around 7-10
+
+- Each cell in my implementation has a type and a hardness, the types are enumerated by an enum
+  called CellType. This is not strictly enforced anywhere, but my implementation sets hardness
+  values between 0 and 10. Hardness of 0 refers to "open" space such as rooms and corridors, while
+  hardness 10 refers to the outer, immutable cells. values 1-9 refer to rock
