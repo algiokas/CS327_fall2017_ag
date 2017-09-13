@@ -5,18 +5,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <limits.h>
+#include <string.h>
 
 #include "dungeon.h"
+#include "pqueue.h"
 
 #define FWIDTH  80 //floor width
 #define FHEIGHT 21 //floor height
 
 #define MINROOMS  5 //minimum rooms per floor as per assignment spec
-#define MAXROOMS  15 //arbitrary upper bound //TODO
+#define MAXROOMS  15 //arbitrary upper bound 
 #define MINROOMWIDTH 3 //minimum width of a room
 #define MINROOMHEIGHT 2 //minimum height of a room
 #define ROOMDENSITY 0.07 //the fraction of the floor that must be rooms
 
+#define HMODVAL 100 //indicates how much the corridor pathfinding should avoid rooms
+
+#define INDEX2D(x, y) (FWIDTH * y) + x
 
 inline int min(int a, int b) {
     if (a > b) {
@@ -45,33 +51,63 @@ inline int max(int a, int b) {
 
     returns: 0 if successful
 */
-int edit_cell(struct Floor *floor, int x_loc, int y_loc, enum CellType input_type, int input_hardn)
+int edit_cell(struct Floor *floor, int x_loc, int y_loc, CType input_type, int input_hardn)
 {
     int cellIndex = (FWIDTH * y_loc) + x_loc;
-    floor->map[cellIndex].type = input_type;
-    floor->map[cellIndex].hardness = input_hardn;
+    floor->type_map[cellIndex] = input_type;
+    floor->hard_map[cellIndex] = input_hardn;
     return 0;
 }
 
-/*  Function get_cell
+/*  Function get_type
     -----------------
-    Takes a cell pointer and sets its value to the address of the cell at
-    location (x_loc, y_loc). Similar to edit_cell, this is mainly just an abstraction
-    of pointer arithmetic to make the floor "map" member feel 2D.
+    takes a floor pointer and the x-y co-ordinates of a cell and returns
+    the type of that cell
 
     floor: The floor from which we are getting a cell
-    cellptr: The pointer where we will assign our cell data 
     x_loc, y_loc: the x and y co-ordinates of the cell we are getting
 
-    returns: 0 if successful
+    returns: the CType value of the cell at (x_loc, y_loc)
 */
-int get_cell(struct Floor *floor, struct Cell *cellptr, int x_loc, int y_loc)
+CType get_type(struct Floor *floor, int x_loc, int y_loc)
 {
+    if (!floor) {
+        printf("get_type() error - Floor not Initalized");
+        return error_c;
+    }
+    if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
+        printf("get_type() error - Index out of bounds");
+        return error_c;
+    }
     int cellIndex = (FWIDTH * y_loc) + x_loc;
-    cellptr->type = floor->map[cellIndex].type;
-    cellptr->hardness = floor->map[cellIndex].hardness;
 
-    return 0;
+    return floor->type_map[cellIndex];
+}
+
+
+/*  Function get_hardness
+    -----------------
+    takes a floor pointer and the x-y co-ordinates of a cell and returns
+    the hardness of that cell
+
+    floor: The floor from which we are getting a cell
+    x_loc, y_loc: the x and y co-ordinates of the cell we are getting
+
+    returns: the hardness value of the cell at (x_loc, y_loc)
+*/
+int get_hardness(struct Floor *floor, int x_loc, int y_loc)
+{
+    if (!floor) {
+        printf("get_type() error - Floor not Initalized");
+        return -1;
+    }
+    if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
+        printf("get_type() error - Index out of bounds");
+        return -1;
+    }
+    int cellIndex = (FWIDTH * y_loc) + x_loc;
+
+    return floor->hard_map[cellIndex];
 }
     
 /*  Function: place_room
@@ -189,49 +225,172 @@ int add_rooms(struct Floor *floor)
 }
 
 
-int draw_path(struct Floor *floor, struct Duo start, struct Duo end)
-{
-    printf("Drawing path from (%d, %d) to (%d, %d)...\n", start.x, start.y, end.x, end.y);
-    int x_loc, y_loc;
-    //int rowOrCol = rand() & 1;
-    struct Cell *tempCell = (struct Cell *) malloc(sizeof(struct Cell));
+/*  Function: dijkstra_path 
+    -----------------------
+    Uses Dijkstra's shortest path algorithm to calculate a path between two
+    locations in the dungeon. The floor map is treated as a graph where adjacent
+    cells are connected, and the edge weights between two cells is equivalent to the
+    hardness of the destination cell. Additionally, the HMODVALUE macro in this file
+    modifies the behaviour of this algorithm to treat rooms cells as higher than their
+    actual hardness. This implementation uses the priority queue in pqueue.c. 
     
-    if (end.x > start.x) {
-        printf("creating path from (%d, %d) to (%d, %d)\n" start.x, start.y, end.x, start.y);
-        for (x_loc = start.x; x_loc < end.x; x_loc++) {
-            get_cell(floor, tempCell, x_loc, start.y);
-            if (tempCell->type == rock_c) {
-                edit_cell(floor, x_loc, start.y, corridor_c, 0);
+    floor: pointer to the floor being modified
+    source, target: ordered pairs that denote the start and end of the path
+    path: a pointer array that is passed to the function and will contain the output path
+
+    returns: 0 if successful
+ */
+int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int *path)
+{
+    printf("Calculating Dijkstra Path...\n");
+    int *dist;
+    int *prev;
+    int *visited;
+    struct PQueue *pq;
+    int current;
+    int *in = (int *) malloc(sizeof(int)); //vertex pointer for passing vertex data to queue
+    int *out = malloc(sizeof(int)); //void pointer for retrieving data from queue
+
+    dist = (int*) malloc(FWIDTH * FHEIGHT * sizeof(int));
+    prev = (int*) malloc(FWIDTH * FHEIGHT * sizeof(int));
+    visited = (int*) malloc(FWIDTH * FHEIGHT * sizeof(int));
+    pq = (struct PQueue *) malloc(sizeof(struct PQueue));
+    init_PQ(pq, (FWIDTH * FHEIGHT / 2), sizeof(int));
+
+    int iter;
+    int sourceIndex = INDEX2D(source.x, source.y);
+    int targetIndex = INDEX2D(target.x, target.y);
+    printf("DPATH: source=%d, target=%d\n" ,sourceIndex, targetIndex);
+    for (iter = 0; iter < FWIDTH * FHEIGHT; iter++) {
+        if (iter == sourceIndex) {
+            dist[iter] = 0;
+            visited[iter] = 1;
+        } else {
+            dist[iter] = INT_MAX;
+            visited[iter] = 0;
+        }
+        prev[iter] = -1;
+    }
+
+    *in = sourceIndex;
+    if(in == NULL) { printf("---INSERT NULL PTR---\n"); }
+    insert(pq, 0, in);
+
+
+    while(pq->size) { //queue is not empty
+        remove_min(pq, out);
+        current = *out;
+        if (current == INDEX2D(target.x, target.y)) {
+            break;
+        }
+        //Left neighbor
+        if ((current % FWIDTH) > 1) {
+            int left = current - 1;
+            int hmod = HMODVAL * (floor->type_map[left] == room_c);
+            if (dist[left] > dist[current] + floor->hard_map[left] + hmod) {
+                dist[left] = dist[current] + floor->hard_map[left] + hmod;
+                prev[left] = current;
+                if (!visited[left]) {
+                    *in = left;
+                    if(!in) { printf("---INSERT NULL PTR---\n"); }
+                    insert(pq, dist[left], in);
+                    visited[left] = 1;
+                }
             }
         }
-    } else if (end.x < start.x) {
-        printf("creating path from (%d, %d) to (%d, %d)\n" start.x, start.y, end.x, start.y);
-        for (x_loc = start.x; x_loc > end.x; x_loc--) { 
-            get_cell(floor, tempCell, x_loc, start.y);
-            if (tempCell->type == rock_c) {
-                edit_cell(floor, x_loc, start.y, corridor_c, 0);
+        //top neighbor
+        if ((current / FWIDTH) > 1) {
+            int top = current - FWIDTH;
+            int hmod = HMODVAL * (floor->type_map[top] == room_c);
+            if (dist[top] > dist[current] + floor->hard_map[top] + hmod) {
+                dist[top] = dist[current] + floor->hard_map[top] + hmod;
+                prev[top] = current;
+                if (!visited[top]) {
+                    *in = top;
+                    if(!in) { printf("---INSERT NULL PTR---\n"); }
+                    insert(pq, dist[top], in);
+                    visited[top] = 1;
+                }
+            }
+        }
+        //right neighbor
+        if ((current % FWIDTH) < FWIDTH - 1) {
+            int right = current + 1;
+            int hmod = HMODVAL * (floor->type_map[right] == room_c);
+            if (dist[right] > dist[current] + floor->hard_map[right] + hmod) {
+                dist[right] = dist[current] + floor->hard_map[right] + hmod;
+                prev[right] = current;
+                if (!visited[right]) {
+                    *in = right;
+                    if(!in) { printf("---INSERT NULL PTR---\n"); }
+                    insert(pq, dist[right], in);
+                    visited[right] = 1;
+                }
+            }
+        }
+        //bottom neighbor
+        if ((current / FWIDTH) < FHEIGHT - 1) {
+            int bottom = current + FWIDTH;
+            int hmod = HMODVAL * (floor->type_map[bottom] == room_c);
+            if (dist[bottom] > dist[current] + floor->hard_map[bottom] + hmod) {
+                dist[bottom] = dist[current] + floor->hard_map[bottom] + hmod;
+                prev[bottom] = current;
+                if (!visited[bottom]) {
+                    *in = bottom;
+                    if(!in) { printf("---INSERT NULL PTR---\n"); }
+                    insert(pq, dist[bottom], in);
+                    visited[bottom] = 1;
+                }
             }
         }
     }
 
-    if (end.y > start.y) {
-        printf("creating path from (%d, %d) to (%d, %d)\n" start.x, start.y, end.x, end.y);
-        for (y_loc = start.y; y_loc < end.y; y_loc = loopstep(y_loc, (end.y - start.y))) {
-            get_cell(floor, tempCell, start.x, y_loc);
-            if (tempCell->type == rock_c) {
-                edit_cell(floor, start.x, y_loc, corridor_c, 0);
-            }
-        }
-    } else if (end.y < start.y) {
-        printf("creating path from (%d, %d) to (%d, %d)\n" start.x, start.y, end.x, end.y);
-        for (y_loc = start.y; y_loc < end.y; y_loc = loopstep(y_loc, (end.y - start.y))) {
-            get_cell(floor, tempCell, start.x, y_loc);
-            if (tempCell->type == rock_c) {
-                edit_cell(floor, start.x, y_loc, corridor_c, 0);
-            }
-        }
+    printf("Constructing path from %d to %d\n", current, sourceIndex);
+    int pathIter = 1;
+    //printf("test1\n");
+    path[0] = current;
+    //printf("test2\n");
+    while (prev[current] != sourceIndex && pathIter < 100) {
+        printf("current=%d, prev[current]= %d, pathIter= %d\n", current, prev[current], pathIter);
+        path[pathIter] = prev[current];
+        current = prev[current];
+        pathIter++;
     }
-    free(tempCell);
+    printf("test3\n");
+
+    printf("path constructed...\n");
+
+    free(dist);
+    free(prev);
+    free(visited);
+    free(pq);
+    free(in);
+    free(out);
+    return 0;
+}
+
+/*  Function: draw_path 
+    -------------------
+    Takes in a path as an int pointer and iterates along the path, modifying
+    each rock cell along the path to be a corridor cell.
+    
+    floor: pointer to the floor being modified
+    path: int array containing the path
+
+    returns: 0 if successful
+*/
+int draw_path(struct Floor *floor, int *path)
+{
+    printf("Drawing Path...\n");
+    int iter = 0;
+    while(path[iter]) {
+        int pathx = (path[iter] % FWIDTH);
+        int pathy = (path[iter] / FWIDTH);
+        if (get_type(floor, pathx, pathy) == rock_c) {
+            edit_cell(floor, pathx, pathy, corridor_c, 0);
+        }
+        iter++;
+    }
     return 0;
 }
 
@@ -250,6 +409,7 @@ int add_corridors(struct Floor *floor)
     printf("NumRooms: %d\n", floor->numRooms);
 
     int roomIter, nextRoom;
+    int *path = (int *) malloc(FWIDTH * FHEIGHT * sizeof(int));
 
     for (roomIter = 0; roomIter < floor->numRooms; roomIter++) {
         struct Duo roomACentroid, roomBCentroid;
@@ -258,15 +418,18 @@ int add_corridors(struct Floor *floor)
         } else {
             nextRoom = roomIter + 1;
         }
-        printf("Room %d to %d path\n", roomIter+1, nextRoom+1);
+        printf("Room %d to %d path\n", roomIter, nextRoom);
 
         roomACentroid.x = floor->rooms[roomIter].loc.x + (floor->rooms[roomIter].dims.x / 2);
         roomACentroid.y = floor->rooms[roomIter].loc.y + (floor->rooms[roomIter].dims.y / 2);
         roomBCentroid.x = floor->rooms[nextRoom].loc.x + (floor->rooms[nextRoom].dims.x / 2);
         roomBCentroid.y = floor->rooms[nextRoom].loc.y + (floor->rooms[nextRoom].dims.y / 2);
-
-        draw_path(floor, roomACentroid, roomBCentroid);
+        
+        dijkstra_path(floor, roomACentroid, roomBCentroid, path);
+        printf("test4\n");
+        draw_path(floor, path);
     }
+    free(path);
     return 0;
 }
 
@@ -275,6 +438,8 @@ int add_corridors(struct Floor *floor)
     Initalizes a floor pointer by setting starting values and allocating memory for
     pointer members. Also sets the values in map to default values, namely immutable
     around the edges and rock with random hardness throughout
+
+    newFloor: pointer to the floor being initialized
 
     returns: 0 if successful
 */
@@ -286,18 +451,19 @@ int init_floor(struct Floor *newFloor)
     newFloor->numRooms = 0;
 
     newFloor->rooms = (struct Room *) malloc(MAXROOMS * sizeof(struct Room));
-    newFloor->map = (struct Cell *) malloc(FWIDTH* FHEIGHT * sizeof(struct Cell));
+    newFloor->type_map = (CType*) malloc(FWIDTH * FHEIGHT * sizeof(CType));
+    newFloor->hard_map = (int *) malloc(FWIDTH * FHEIGHT * sizeof(int));
 
     int celliter;
     for (celliter = 0; celliter < (FWIDTH * FHEIGHT); celliter++) {
         if (celliter < FWIDTH || (celliter % FWIDTH) == 0 ||
             (celliter % FWIDTH) == FWIDTH - 1 || celliter > (FWIDTH) * (FHEIGHT-1)) {
-            newFloor->map[celliter].type = immutable_c;
-            newFloor->map[celliter].hardness = 10;
+            newFloor->type_map[celliter] = immutable_c;
+            newFloor->hard_map[celliter] = 255;
         } else {
-            int rand_hardness = 1 + (rand() % 9);
-            newFloor->map[celliter].type = rock_c;
-            newFloor->map[celliter].hardness = rand_hardness;
+            int rand_hardness = 1 + (rand() % 254);
+            newFloor->type_map[celliter] = rock_c;
+            newFloor->hard_map[celliter] = rand_hardness;
         }
     }
     return 0;
@@ -316,7 +482,8 @@ int delete_floor(struct Floor *floor)
 {
     printf("Deleting Floor...\n");
     free(floor->rooms);
-    free(floor->map);
+    free(floor->type_map);
+    free(floor->hard_map);
     free(floor);
 
     return 0;
@@ -327,23 +494,22 @@ int delete_floor(struct Floor *floor)
     prints the map of a floor to the console with a border
 
     floor: a pointer to the floor to be printed
+    
+    returns: 0 if successful
 */
-void print_floor(struct Floor *floor)
+int print_floor(struct Floor *floor)
 {
     int row, col, dash;
-    printf("Dungeon (homework 1)\n");
+    printf("Dungeon Map\n");
     //top edge of border
     for (dash = 0; dash < FWIDTH + 2; dash++) {
         printf("-");
     }
     printf("\n");
-    struct Cell *cell = (struct Cell*) malloc(sizeof(struct Cell));
     for (col = 0; col < FHEIGHT; col++) {
         printf("|");
         for (row = 0; row < FWIDTH; row++) {
-            get_cell(floor, cell, row, col);
-
-            switch(cell->type) {
+            switch(get_type(floor, row, col)) {
                 case(immutable_c) :
                     printf(" ");
                     break;
@@ -362,12 +528,12 @@ void print_floor(struct Floor *floor)
         }
         printf("|\n");
     }
-    free(cell);
     //bottom edge of border
     for (dash = 0; dash < FWIDTH + 2; dash++) {
         printf("-");
     }
     printf("\n");
+    return 0;
 }
 
 //local function for debugging the output
@@ -382,7 +548,7 @@ int debug_floor(struct Floor *floor) {
         printf("    Dimensions: %dx%d \n", floor->rooms[i].dims.x, floor->rooms[i].dims.y);
         printf("test1\n");
     }
-    printf("Debug Output End...");
+    printf("Debug Output End...\n");
 }
  
 

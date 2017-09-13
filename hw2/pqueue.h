@@ -24,6 +24,7 @@ int delete_PQ(struct PQueue *toDelete);
 int is_empty(struct PQueue *pq);
 int insert(struct PQueue *pq, int prio, void *data);
 int remove_min(struct PQueue *pq, void *data);
+int peek_min(struct PQueue *pq, void *data);
 int print_PQ(struct PQueue *pq);
 
 #endif

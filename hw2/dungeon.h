@@ -10,21 +10,13 @@ struct Duo {
 };
 
 //enumerates possible cell types
-enum CellType {
+typedef enum cellType {
     immutable_c,
     rock_c,
     room_c,
-    corridor_c
-};
-
-//a cell in the dungeon. Cells have a type and a hardness, they may also have additional 
-//properties in the future. hardness is a property of all cells, however only rock has 
-//variable hardness, the hardness of open cells (room,corridor) is 0 and the hardness of immutable
-//cells is 255 
-struct Cell {
-    enum CellType type;
-    int hardness;
-};
+    corridor_c,
+    error_c
+} CType;
 
 //encapsulates a room, loc is the location of the top-left corner of the room
 //dims describes the dimensions (width, height)
@@ -39,12 +31,15 @@ struct Floor {
     int height;
     int numRooms;
     struct Room *rooms;
-    struct Cell *map; //this will be a 2D array but we want memory allocated in a contiguous block
+    CType *type_map;
+    int *hard_map;
 };
 
-int edit_cell(struct Floor *floor, int x_loc, int y_loc, enum CellType input_type, int input_hardn);
+int edit_cell(struct Floor *floor, int x_loc, int y_loc, CType input_type, int input_hardn);
 
-int get_cell(struct Floor *floor, struct Cell *cellptr, int x_loc, int y_loc);
+CType get_type(struct Floor *floor, int x_loc, int y_loc);
+
+int get_hardness(struct Floor *floor, int x_loc, int y_loc);
 
 int place_room(struct Floor *floor, struct Room *room);
 
@@ -58,6 +53,6 @@ int init_floor(struct Floor *newFloor);
 
 int delete_floor(struct Floor *floor);
 
-void print_floor(struct Floor *floor);
+int print_floor(struct Floor *floor);
 
 #endif

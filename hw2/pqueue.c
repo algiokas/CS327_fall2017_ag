@@ -43,7 +43,7 @@ int delete_PQ(struct PQueue *toDelete)
 }
 
 int percolate_up(struct PQueue *pq, int nodeIndex) {
-    printf("Percolating Up... \n");
+    //printf("Percolating Up... \n");
     int idx = nodeIndex;
     if (pq->nodes[idx].priority < pq->nodes[PARENT(idx)].priority) {
         struct PQNode temp = pq->nodes[idx];
@@ -57,21 +57,20 @@ int percolate_up(struct PQueue *pq, int nodeIndex) {
 }
 
 int percolate_down(struct PQueue *pq, int nodeIndex) {
-    printf("Percolating Down... \n");
-    if (nodeIndex+1 >= pq->size) {
-        return 0;
-    }
+    //printf("Percolating Down... \n");
     int idx = nodeIndex;
     int left = LEFT_CHILD(idx);
     int right = RIGHT_CHILD(idx);
-    if (right >= pq->size) {
-        right = left;
+    if (right >= pq->size || left >= pq->size) {
+        return 0;
     }
     
     if (pq->nodes[idx].priority > pq->nodes[left].priority
         || pq->nodes[idx].priority > pq->nodes[right].priority)
         {
         int minChild = min_prio(pq, left, right);
+        //printf("PDOWN: Queue Size=%d, idx=%d, minChild=%d\n", pq->size, idx, minChild);
+        //printf("PDOWN: Swapping %p and %p\n", pq->nodes[idx].data, pq->nodes[minChild].data);
         struct PQNode temp = pq->nodes[idx];
         pq->nodes[idx] = pq->nodes[minChild];
         pq->nodes[minChild] = temp;
@@ -86,10 +85,30 @@ int is_empty(struct PQueue *pq)
     return (!pq->size);
 } 
 
+int print_PQ(struct PQueue *pq) {
+    printf("\n Priorty Queue ---\n");
+    printf("Element Size: %d \n", pq->elementSize);
+    printf("Queue Capacity: %d \n", pq->capacity);
+    printf("Queue Size: %d \n", pq->size);
+    int i;
+    printf("Queue Contents (Priority): {");
+    for (i = 0; i < pq->size; i++) {
+        printf("%d", pq->nodes[i].priority);
+        if (i < pq->size - 1) {
+            printf(", ");
+        }
+    }
+    printf("}\n");
+
+    printf("Queue Contents (pointers): \n");
+    for (i = 0; i < pq->size; i++) {
+        printf("%p\n", pq->nodes[i].data);
+    }
+}
 
 int insert(struct PQueue *pq, int prio, void *data)
 {
-    printf("Inserting Element with Priority %d ... \n", prio);
+    //printf("Inserting Element with Priority %d ... \n", prio);
     //if the pq reaches capacity, double its size
     if (pq->size + 1 > pq->capacity) {
         pq->capacity = pq->capacity * 2;
@@ -102,6 +121,7 @@ int insert(struct PQueue *pq, int prio, void *data)
     newNode.data = dataptr;
 
     //copy the data from the void *data argument into the newly allocated pointer
+    //printf("memcpy from %p to %p ...\n", data, newNode.data);
     memcpy(newNode.data, data, pq->elementSize);
     int end = pq->size++;
     newNode.priority = prio;
@@ -115,12 +135,15 @@ int insert(struct PQueue *pq, int prio, void *data)
 
 int remove_min(struct PQueue *pq, void *data)
 {
-    printf("Removing Min Element... \n");
+    //printf("\nRemoving Min Element... \n");
     //printf("removing min...\n");
     if(!pq->size) {
         return 1;
     }
+    //print_PQ(pq);
+    //printf("memcpy from %p to %p ...\n\n", pq->nodes[0].data, data);
     memcpy(data, pq->nodes[0].data, pq->elementSize);
+    //printf("free...\n");
     free(pq->nodes[0].data);
     if (pq->size > 1) {
         //move last node to the root of the heap
@@ -129,22 +152,6 @@ int remove_min(struct PQueue *pq, void *data)
     }
     pq->size--;
     return 0;
-}
-
-int print_PQ(struct PQueue *pq) {
-    printf("Priorty Queue ---\n");
-    printf("Element Size: %d \n", pq->elementSize);
-    printf("Queue Capacity: %d \n", pq->capacity);
-    printf("Queue Size: %d \n", pq->size);
-    int i;
-    printf("Queue Contents (Priority): {");
-    for (i = 0; i < pq->size; i++) {
-        printf("%d", pq->nodes[i].priority);
-        if (i < pq->size - 1) {
-            printf(", ");
-        }
-    }
-    printf("}\n\n");
 }
 
 

@@ -112,4 +112,47 @@ Primary Changelog
 
 9/11/2017
 ---------------------
+- finished implementing insert()
 
+- renamed files, structs and functions from some variation of "heap" to some variation of "pqueue"
+  since the heap implementation specifically relies on a priority value
+
+- started to implement remove_min()
+
+- created local functions percolate_up() and percolate_down() to handle maintaining the structure
+  of the heap
+
+- created local function min_prio() to compare the priority of two indices
+
+- completed implementing remove_min()
+
+- Priority queue for dijkstra's algorithm is now fully implemented and working
+
+- in Dungeon.c, changed draw_path() function so that it only draws a path based on an array
+  of map indices, rather than having the path calculation in this function.
+
+- Created dijkstra_path() function
+
+9/12/2017
+---------------------
+- In dungeon.h, removed Cell struct, removed the "map" member from the floor struct and replaced
+  it with type_map and hardness_map for performance reasons.
+
+- Added typedef alias "CType" to CellType enum
+
+- Modified all functions in dungeon.h that took Cell structs, or Cell struct pointers to instead
+  either take an int pointer, or return an int or CType
+
+- in dungeon.c, split get_cell() into get_type() and get_hardness() functions which, instead of
+  returning a cell struct, return the respective values for that cell
+
+- replaced all uses of enum CellType with CType alias
+
+- Any use of the Cell struct was removed and replaced with seperate values where needed
+
+9/13/2017
+---------------------
+- Completed implementation of dijkstra_path() function and draw_path() functions. Corridors in
+  the dungeon are no longer straight line based and can meander a bit around the dungeon
+
+- 
