@@ -22,8 +22,12 @@
 
 #define HMODVAL 100 //indicates how much the corridor pathfinding should avoid rooms
 
-#define INDEX2D(x, y) (FWIDTH * y) + x
+//converts the 2D representation of a location into a linear array index
+#define INDEX2D(x, y) (FWIDTH * y) + x 
 
+int debug_output = 0;
+
+//Inline min and max functions to avoid some issues with the corresponding macros
 inline int min(int a, int b) {
     if (a > b) {
         return b;
@@ -53,6 +57,15 @@ inline int max(int a, int b) {
 */
 int edit_cell(struct Floor *floor, int x_loc, int y_loc, CType input_type, int input_hardn)
 {
+    
+    if (!floor) {
+        if (debug_output) { printf("edit_cell() error - Floor not Initalized"); }
+        return -1;
+    }
+    if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
+        if (debug_output) { printf("edit_cell() error - Index out of bounds"); }
+        return -1;
+    }
     int cellIndex = (FWIDTH * y_loc) + x_loc;
     floor->type_map[cellIndex] = input_type;
     floor->hard_map[cellIndex] = input_hardn;
@@ -72,11 +85,11 @@ int edit_cell(struct Floor *floor, int x_loc, int y_loc, CType input_type, int i
 CType get_type(struct Floor *floor, int x_loc, int y_loc)
 {
     if (!floor) {
-        printf("get_type() error - Floor not Initalized");
+        if (debug_output) { printf("get_type() error - Floor not Initalized"); }
         return error_c;
     }
     if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
-        printf("get_type() error - Index out of bounds");
+        if (debug_output) { printf("get_type() error - Index out of bounds"); }
         return error_c;
     }
     int cellIndex = (FWIDTH * y_loc) + x_loc;
@@ -98,11 +111,12 @@ CType get_type(struct Floor *floor, int x_loc, int y_loc)
 int get_hardness(struct Floor *floor, int x_loc, int y_loc)
 {
     if (!floor) {
-        printf("get_type() error - Floor not Initalized");
+
+        if (debug_output) { printf("get_hardness() error - Floor not Initalized"); }
         return -1;
     }
     if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
-        printf("get_type() error - Index out of bounds");
+        if (debug_output) { printf("get_hardness() error - Floor not Initalized"); }
         return -1;
     }
     int cellIndex = (FWIDTH * y_loc) + x_loc;
@@ -120,7 +134,7 @@ int get_hardness(struct Floor *floor, int x_loc, int y_loc)
 */
 int place_room(struct Floor *floor, struct Room *room)
 {
-    printf("Placing Room...\n"); 
+    if (debug_output) { printf("Placing Room...\n"); }
     int row, col;
     for (col = room->loc.y; col < room->loc.y + room->dims.y; col++) {
         for (row = room->loc.x; row < room->loc.x + room->dims.x; row++) {
@@ -142,7 +156,7 @@ int place_room(struct Floor *floor, struct Room *room)
 */
 int check_intersection(struct Floor *floor, struct Room * room)
 {
-    printf("Checking Intersection...\n");
+    if (debug_output) { printf("Checking Intersection...\n"); }
     if (!floor->numRooms) {
         return 0;
     }
@@ -183,7 +197,7 @@ int check_intersection(struct Floor *floor, struct Room * room)
  */
 int add_rooms(struct Floor *floor)
 {
-    printf("Adding Rooms...\n");
+    if (debug_output) { printf("Adding Rooms...\n"); }
     double floorsize = floor->width * floor->height;
     double freespace = floorsize; //the total amount of free space within which to place rooms
     int roomIter = 0;
@@ -242,7 +256,7 @@ int add_rooms(struct Floor *floor)
  */
 int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int *path)
 {
-    printf("Calculating Dijkstra Path...\n");
+    if (debug_output) { printf("Calculating Dijkstra Path...\n"); }
     int *dist;
     int *prev;
     int *visited;
@@ -260,7 +274,8 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
     int iter;
     int sourceIndex = INDEX2D(source.x, source.y);
     int targetIndex = INDEX2D(target.x, target.y);
-    printf("DPATH: source=%d, target=%d\n" ,sourceIndex, targetIndex);
+    if (debug_output) { printf("DPATH: source=%d, target=%d\n" ,sourceIndex, targetIndex); }
+
     for (iter = 0; iter < FWIDTH * FHEIGHT; iter++) {
         if (iter == sourceIndex) {
             dist[iter] = 0;
@@ -273,7 +288,6 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
     }
 
     *in = sourceIndex;
-    if(in == NULL) { printf("---INSERT NULL PTR---\n"); }
     insert(pq, 0, in);
 
 
@@ -292,7 +306,6 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 prev[left] = current;
                 if (!visited[left]) {
                     *in = left;
-                    if(!in) { printf("---INSERT NULL PTR---\n"); }
                     insert(pq, dist[left], in);
                     visited[left] = 1;
                 }
@@ -307,7 +320,6 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 prev[top] = current;
                 if (!visited[top]) {
                     *in = top;
-                    if(!in) { printf("---INSERT NULL PTR---\n"); }
                     insert(pq, dist[top], in);
                     visited[top] = 1;
                 }
@@ -322,7 +334,6 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 prev[right] = current;
                 if (!visited[right]) {
                     *in = right;
-                    if(!in) { printf("---INSERT NULL PTR---\n"); }
                     insert(pq, dist[right], in);
                     visited[right] = 1;
                 }
@@ -337,7 +348,6 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 prev[bottom] = current;
                 if (!visited[bottom]) {
                     *in = bottom;
-                    if(!in) { printf("---INSERT NULL PTR---\n"); }
                     insert(pq, dist[bottom], in);
                     visited[bottom] = 1;
                 }
@@ -345,20 +355,16 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
         }
     }
 
-    printf("Constructing path from %d to %d\n", current, sourceIndex);
+    if (debug_output) { printf("Constructing path from %d to %d\n", current, sourceIndex); }
     int pathIter = 1;
     //printf("test1\n");
     path[0] = current;
     //printf("test2\n");
     while (prev[current] != sourceIndex && pathIter < 100) {
-        printf("current=%d, prev[current]= %d, pathIter= %d\n", current, prev[current], pathIter);
         path[pathIter] = prev[current];
         current = prev[current];
         pathIter++;
     }
-    printf("test3\n");
-
-    printf("path constructed...\n");
 
     free(dist);
     free(prev);
@@ -381,7 +387,7 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
 */
 int draw_path(struct Floor *floor, int *path)
 {
-    printf("Drawing Path...\n");
+    if (debug_output) { printf("Drawing Path...\n"); }
     int iter = 0;
     while(path[iter]) {
         int pathx = (path[iter] % FWIDTH);
@@ -405,8 +411,10 @@ int draw_path(struct Floor *floor, int *path)
 */
 int add_corridors(struct Floor *floor)
 {
-    printf("Adding Corridors...\n");
-    printf("NumRooms: %d\n", floor->numRooms);
+    if (debug_output) {
+        printf("Adding Corridors...\n");
+        printf("NumRooms: %d\n", floor->numRooms);
+    }
 
     int roomIter, nextRoom;
     int *path = (int *) malloc(FWIDTH * FHEIGHT * sizeof(int));
@@ -418,7 +426,7 @@ int add_corridors(struct Floor *floor)
         } else {
             nextRoom = roomIter + 1;
         }
-        printf("Room %d to %d path\n", roomIter, nextRoom);
+        if (debug_output) { printf("Room %d to %d path\n", roomIter, nextRoom); }
 
         roomACentroid.x = floor->rooms[roomIter].loc.x + (floor->rooms[roomIter].dims.x / 2);
         roomACentroid.y = floor->rooms[roomIter].loc.y + (floor->rooms[roomIter].dims.y / 2);
@@ -426,7 +434,6 @@ int add_corridors(struct Floor *floor)
         roomBCentroid.y = floor->rooms[nextRoom].loc.y + (floor->rooms[nextRoom].dims.y / 2);
         
         dijkstra_path(floor, roomACentroid, roomBCentroid, path);
-        printf("test4\n");
         draw_path(floor, path);
     }
     free(path);
@@ -445,7 +452,7 @@ int add_corridors(struct Floor *floor)
 */
 int init_floor(struct Floor *newFloor)
 {
-    printf("Initializing Floor...\n");
+    if (debug_output) { printf("Initializing Floor...\n"); }
     newFloor->width = FWIDTH;
     newFloor->height = FHEIGHT;
     newFloor->numRooms = 0;
@@ -480,7 +487,7 @@ int init_floor(struct Floor *newFloor)
 */
 int delete_floor(struct Floor *floor)
 {
-    printf("Deleting Floor...\n");
+    if (debug_output) { printf("Deleting Floor...\n"); }
     free(floor->rooms);
     free(floor->type_map);
     free(floor->hard_map);
@@ -556,11 +563,21 @@ int main(int argc, char *argv[])
 {
     srand(time(NULL));
     struct Floor *newFloor = (struct Floor *) malloc(sizeof(struct Floor));
-    init_floor(newFloor);
-    add_rooms(newFloor);
-    add_corridors(newFloor);
-    //system("clear");
-    debug_floor(newFloor);
+    
+    int save = 0;
+    int load = 0;
+
+    int argNum = 1;
+    
+    if (!load) {
+        init_floor(newFloor);
+        add_rooms(newFloor);
+        add_corridors(newFloor);
+    }
+    
+    
+    
+    if (debug_output) { debug_floor(newFloor); }
     print_floor(newFloor);
     printf("Press Enter to Exit:\n");
     getchar();

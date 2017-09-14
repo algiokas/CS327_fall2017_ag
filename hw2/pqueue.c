@@ -18,7 +18,7 @@ int min_prio(struct PQueue *pq, int idxA, int idxB)
 
 int init_PQ(struct PQueue *newPQ, int capacity, int elementsize)
 {
-    printf("Initializing Priority Queue... \n");
+    //printf("Initializing Priority Queue... \n");
     newPQ->nodes = (struct PQNode *) malloc(capacity * sizeof(struct PQNode));
     newPQ->elementSize = elementsize;
     newPQ->capacity = capacity;
@@ -28,7 +28,7 @@ int init_PQ(struct PQueue *newPQ, int capacity, int elementsize)
 
 int delete_PQ(struct PQueue *toDelete)
 {
-    printf("Deleting Priority Queue... \n");
+    //printf("Deleting Priority Queue... \n");
     if (!toDelete) {
         return 1;
     }
@@ -69,8 +69,6 @@ int percolate_down(struct PQueue *pq, int nodeIndex) {
         || pq->nodes[idx].priority > pq->nodes[right].priority)
         {
         int minChild = min_prio(pq, left, right);
-        //printf("PDOWN: Queue Size=%d, idx=%d, minChild=%d\n", pq->size, idx, minChild);
-        //printf("PDOWN: Swapping %p and %p\n", pq->nodes[idx].data, pq->nodes[minChild].data);
         struct PQNode temp = pq->nodes[idx];
         pq->nodes[idx] = pq->nodes[minChild];
         pq->nodes[minChild] = temp;
@@ -121,7 +119,6 @@ int insert(struct PQueue *pq, int prio, void *data)
     newNode.data = dataptr;
 
     //copy the data from the void *data argument into the newly allocated pointer
-    //printf("memcpy from %p to %p ...\n", data, newNode.data);
     memcpy(newNode.data, data, pq->elementSize);
     int end = pq->size++;
     newNode.priority = prio;
@@ -135,15 +132,11 @@ int insert(struct PQueue *pq, int prio, void *data)
 
 int remove_min(struct PQueue *pq, void *data)
 {
-    //printf("\nRemoving Min Element... \n");
     //printf("removing min...\n");
     if(!pq->size) {
         return 1;
     }
-    //print_PQ(pq);
-    //printf("memcpy from %p to %p ...\n\n", pq->nodes[0].data, data);
     memcpy(data, pq->nodes[0].data, pq->elementSize);
-    //printf("free...\n");
     free(pq->nodes[0].data);
     if (pq->size > 1) {
         //move last node to the root of the heap

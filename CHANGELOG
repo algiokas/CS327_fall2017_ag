@@ -155,4 +155,9 @@ Primary Changelog
 - Completed implementation of dijkstra_path() function and draw_path() functions. Corridors in
   the dungeon are no longer straight line based and can meander a bit around the dungeon
 
-- 
+- Added an int debug_output as a global variable. All debug messages (for example those at the
+  beginning of functions) will only be printed if this variable is 1. For now it is simply set
+  by me personally, however I plan to make it controllable with some sort of command line switch
+  like a --debug argument which is the main reason I made it a global variable rather than a macro
+
+
