@@ -560,12 +560,11 @@ int debug_floor(struct Floor *floor) {
         printf("Floor number %d \n", i);
         printf("    location: (%d, %d) \n", floor->rooms[i].loc.x, floor->rooms[i].loc.y);
         printf("    Dimensions: %dx%d \n", floor->rooms[i].dims.x, floor->rooms[i].dims.y);
-        printf("test1\n");
     }
     printf("Debug Output End...\n");
 }
  
-int do_load(struct Floor *floor) {
+int do_load(struct Floor *floor, char *filename) {
     if (debug_output) { printf("Loading from file...\n"); }
 
     char *home; //will be the path of the home directory
@@ -575,27 +574,29 @@ int do_load(struct Floor *floor) {
     char *marker = "RLG327"; //the file type marker for this file
     int32_t version = PVERSION;
     int32_t fsize;
+    int roomCapacity = MAXROOMS;
 
     floor->width = FWIDTH;
     floor->height = FHEIGHT;
     floor->numRooms = 0;
+    
 
-    floor->rooms = (struct Room *) malloc(MAXROOMS * sizeof(struct Room));
+    floor->rooms = (struct Room *) malloc(roomCapacity * sizeof(struct Room));
     floor->type_map = (CType*) malloc(FWIDTH * FHEIGHT * sizeof(CType));
     floor->hard_map = (int *) malloc(FWIDTH * FHEIGHT * sizeof(int));
     
     home = getenv("HOME");
-    rpath = RPATH;
+    rpath = filename;
     path = (char *) malloc((strlen(home) + strlen(rpath) + 2) * sizeof(char));
     strcpy(path, home);
     strcat(path, rpath);
     
     //buffers to store the header information for the fil
-    unsigned char *marker_buff = (unsigned char *) malloc(7 * sizeof(unsigned char));
-    unsigned char *version_buff = (unsigned char *) malloc(5 * sizeof(unsigned char));
-    unsigned char *size_buff = (unsigned char *) malloc(5 * sizeof(unsigned char));
+    unsigned char marker_buff[7];
+    unsigned char version_buff[5];
+    unsigned char size_buff[5];
 
-    struct Room *temp_room = (struct Room *) malloc(sizeof(struct Room));
+    struct Room temp_room;
 
     f = fopen(path, "r");
 
@@ -656,30 +657,37 @@ int do_load(struct Floor *floor) {
         if (i > 1693) {
             switch((i - 1694) % 4) {
                 case 0:
-                    temp_room->loc.y = ch;
+                    temp_room.loc.y = ch;
                     break;
                 case 1:
-                    temp_room->loc.x = ch;
+                    temp_room.loc.x = ch;
                     break;
                 case 2:
-                    temp_room->dims.y = ch;
+                    temp_room.dims.y = ch;
                     break;
                 case 3:
-                    temp_room->dims.x = ch;
+                    temp_room.dims.x = ch;
                     int roomNum = (i - 1694) / 4;
-                    floor->rooms[roomNum] = *temp_room;
+                    floor->rooms[roomNum] = temp_room;
                     floor->numRooms++;
-                    place_room(floor, temp_room);
+
+                    if (floor->numRooms + 1 >= roomCapacity) {
+                        struct Room *temp_rooms;
+                        temp_rooms = (struct Room *) realloc(floor->rooms, 
+                                     2 * roomCapacity * sizeof(struct Room));
+                        if (temp_rooms == NULL) {
+                            printf("Error in do_load(): realloc failure\n");
+                        } else {
+                            floor->rooms = temp_rooms;
+                            roomCapacity = roomCapacity * 2;
+                        }
+                    }
+                    place_room(floor, &temp_room);
                     break;
             }
         }
         i++;
     }
-
-    free(marker_buff);
-    free(version_buff);
-    free(size_buff);
-    free(temp_room);
     
     fclose(f);
     return 0;
@@ -761,12 +769,8 @@ int do_save(struct Floor *floor) {
 
 int main(int argc, char *argv[])
 {
-    if (argc > 2) {
-        printf("Usage: ./dungeon [--save] [--load]\n");
-        return 0;
-    }
     srand(time(NULL));
-    struct Floor *newFloor = (struct Floor *) malloc(sizeof(struct Floor));
+    struct Floor newFloor;
     
     int save = 0;
     int load = 0;
@@ -783,27 +787,32 @@ int main(int argc, char *argv[])
             load = 1;
         } else if (!strcmp(argv[argNum], "--l")) {
             load = 1;
+        } else if (!strcmp(argv[argNum], "--DEBUG")) {
+            debug_output = 1;
+        } else {
+            printf("Invalid argument, Usage: ./dungeon [--save] [--load] [--DEBUG]\n");
+            return 0;
         }
     }
 
     if (load) {
-        do_load(newFloor); 
+        do_load(&newFloor, RPATH); 
         printf("LOAD DUNGEON\n");
     } else { 
-        init_floor(newFloor);
-        add_rooms(newFloor);
-        add_corridors(newFloor);
+        init_floor(&newFloor);
+        add_rooms(&newFloor);
+        add_corridors(&newFloor);
     } 
-    if (debug_output) { debug_floor(newFloor); }
-    print_floor(newFloor);
+    if (debug_output) { debug_floor(&newFloor); }
+    print_floor(&newFloor);
     printf("Press Enter to Exit:\n");
     getchar();
     
     if (save) {
-        do_save(newFloor);
+        do_save(&newFloor);
         printf("SAVE DUNGEON\n");
     }
 
-    delete_floor(newFloor);
+    delete_floor(&newFloor);
     return 0;
 }

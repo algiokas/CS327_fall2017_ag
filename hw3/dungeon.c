@@ -263,16 +263,15 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
     int *dist;
     int *prev;
     int *visited;
-    struct PQueue *pq;
-    int current;
-    int *in = (int *) malloc(sizeof(int)); //vertex pointer for passing vertex data to queue
-    int *out = malloc(sizeof(int)); //void pointer for retrieving data from queue
+    struct PQueue pq;
+    int current = -1;
+    int in;
+    int out;
 
     dist = (int*) malloc(FWIDTH * FHEIGHT * sizeof(int));
     prev = (int*) malloc(FWIDTH * FHEIGHT * sizeof(int));
     visited = (int*) malloc(FWIDTH * FHEIGHT * sizeof(int));
-    pq = (struct PQueue *) malloc(sizeof(struct PQueue));
-    init_PQ(pq, (FWIDTH * FHEIGHT / 2), sizeof(int));
+    init_PQ(&pq, (FWIDTH * FHEIGHT / 2), sizeof(int));
 
     int iter;
     int sourceIndex = INDEX2D(source.x, source.y);
@@ -290,13 +289,13 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
         prev[iter] = -1;
     }
 
-    *in = sourceIndex;
-    insert(pq, 0, in);
+    in = sourceIndex;
+    insert(&pq, 0, &in);
 
 
-    while(pq->size) { //queue is not empty
-        remove_min(pq, out);
-        current = *out;
+    while(pq.size) { //queue is not empty
+        remove_min(&pq, &out);
+        current = out;
         if (current == INDEX2D(target.x, target.y)) {
             break;
         }
@@ -308,8 +307,8 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 dist[left] = dist[current] + floor->hard_map[left] + hmod;
                 prev[left] = current;
                 if (!visited[left]) {
-                    *in = left;
-                    insert(pq, dist[left], in);
+                    in = left;
+                    insert(&pq, dist[left], &in);
                     visited[left] = 1;
                 }
             }
@@ -322,8 +321,8 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 dist[top] = dist[current] + floor->hard_map[top] + hmod;
                 prev[top] = current;
                 if (!visited[top]) {
-                    *in = top;
-                    insert(pq, dist[top], in);
+                    in = top;
+                    insert(&pq, dist[top], &in);
                     visited[top] = 1;
                 }
             }
@@ -336,8 +335,8 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 dist[right] = dist[current] + floor->hard_map[right] + hmod;
                 prev[right] = current;
                 if (!visited[right]) {
-                    *in = right;
-                    insert(pq, dist[right], in);
+                    in = right;
+                    insert(&pq, dist[right], &in);
                     visited[right] = 1;
                 }
             }
@@ -350,31 +349,30 @@ int dijkstra_path(struct Floor *floor, struct Duo source, struct Duo target, int
                 dist[bottom] = dist[current] + floor->hard_map[bottom] + hmod;
                 prev[bottom] = current;
                 if (!visited[bottom]) {
-                    *in = bottom;
-                    insert(pq, dist[bottom], in);
+                    in = bottom;
+                    insert(&pq, dist[bottom], &in);
                     visited[bottom] = 1;
                 }
             }
         }
     }
-
+    if (current == -1) {
+        printf("dijkstra_path() error : queue failure\n");
+        return -1;
+    }
     if (debug_output) { printf("Constructing path from %d to %d\n", current, sourceIndex); }
     int pathIter = 1;
-    //printf("test1\n");
     path[0] = current;
-    //printf("test2\n");
     while (prev[current] != sourceIndex && pathIter < 100) {
         path[pathIter] = prev[current];
         current = prev[current];
         pathIter++;
     }
     
-    delete_PQ(pq);
+    delete_PQ(&pq);
     free(dist);
     free(prev);
     free(visited);
-    free(in);
-    free(out);
     return 0;
 }
 
@@ -498,7 +496,6 @@ int delete_floor(struct Floor *floor)
     free(floor->rooms);
     free(floor->type_map);
     free(floor->hard_map);
-    free(floor);
 
     return 0;
 }
@@ -560,42 +557,44 @@ int debug_floor(struct Floor *floor) {
         printf("Floor number %d \n", i);
         printf("    location: (%d, %d) \n", floor->rooms[i].loc.x, floor->rooms[i].loc.y);
         printf("    Dimensions: %dx%d \n", floor->rooms[i].dims.x, floor->rooms[i].dims.y);
-        printf("test1\n");
     }
     printf("Debug Output End...\n");
+    return 0;
 }
  
-int do_load(struct Floor *floor) {
+int do_load(struct Floor *floor, char *filename) {
     if (debug_output) { printf("Loading from file...\n"); }
 
     char *home; //will be the path of the home directory
     char *rpath; //the path from the home dir to the file
     char *path; //the entire path
     FILE *f;
-    char *marker = "RLG327"; //the file type marker for this file
+    const char *marker = "RLG327"; //the file type marker for this file
     int32_t version = PVERSION;
-    int32_t fsize;
+    //int32_t fsize;
+    int roomCapacity = MAXROOMS;
 
     floor->width = FWIDTH;
     floor->height = FHEIGHT;
     floor->numRooms = 0;
+    
 
-    floor->rooms = (struct Room *) malloc(MAXROOMS * sizeof(struct Room));
+    floor->rooms = (struct Room *) malloc(roomCapacity * sizeof(struct Room));
     floor->type_map = (CType*) malloc(FWIDTH * FHEIGHT * sizeof(CType));
     floor->hard_map = (int *) malloc(FWIDTH * FHEIGHT * sizeof(int));
     
     home = getenv("HOME");
-    rpath = RPATH;
+    rpath = filename;
     path = (char *) malloc((strlen(home) + strlen(rpath) + 2) * sizeof(char));
     strcpy(path, home);
     strcat(path, rpath);
     
     //buffers to store the header information for the fil
-    unsigned char *marker_buff = (unsigned char *) malloc(7 * sizeof(unsigned char));
-    unsigned char *version_buff = (unsigned char *) malloc(5 * sizeof(unsigned char));
-    unsigned char *size_buff = (unsigned char *) malloc(5 * sizeof(unsigned char));
+    unsigned char marker_buff[7];
+    unsigned char version_buff[5];
+    unsigned char size_buff[5];
 
-    struct Room *temp_room = (struct Room *) malloc(sizeof(struct Room));
+    struct Room temp_room;
 
     f = fopen(path, "r");
 
@@ -609,7 +608,7 @@ int do_load(struct Floor *floor) {
             marker_buff[i] = (unsigned char) ch;
         } else if (i == 6) {
             marker_buff[6] = '\0';
-            if (strcmp(marker_buff, marker) != 0) {
+            if (strcmp((const char *) marker_buff, marker) != 0) {
                 printf("do_load() warning: Invalid file marker\n");
             }
         }
@@ -633,7 +632,7 @@ int do_load(struct Floor *floor) {
             size_buff[4] = '\0';
             int32_t s;
             memcpy(&s, size_buff, sizeof(int32_t));
-            fsize = s;
+            //fsize = s;
             if (s < 1694) {
                 printf("do_load() warning: invalid file size\n");
             }
@@ -641,8 +640,6 @@ int do_load(struct Floor *floor) {
         
         //read dungeon cells
         if (i > 13 && i < 1694) {
-            int x = ((i - 14) % FWIDTH);
-            int y = ((i - 14) / FHEIGHT);
             floor->hard_map[i - 14] = ch;
             if (ch == 255) {
                 floor->type_map[i - 14] = immutable_c;
@@ -656,30 +653,37 @@ int do_load(struct Floor *floor) {
         if (i > 1693) {
             switch((i - 1694) % 4) {
                 case 0:
-                    temp_room->loc.y = ch;
+                    temp_room.loc.y = ch;
                     break;
                 case 1:
-                    temp_room->loc.x = ch;
+                    temp_room.loc.x = ch;
                     break;
                 case 2:
-                    temp_room->dims.y = ch;
+                    temp_room.dims.y = ch;
                     break;
                 case 3:
-                    temp_room->dims.x = ch;
+                    temp_room.dims.x = ch;
                     int roomNum = (i - 1694) / 4;
-                    floor->rooms[roomNum] = *temp_room;
+                    floor->rooms[roomNum] = temp_room;
                     floor->numRooms++;
-                    place_room(floor, temp_room);
+
+                    if (floor->numRooms + 1 >= roomCapacity) {
+                        struct Room *temp_rooms;
+                        temp_rooms = (struct Room *) realloc(floor->rooms, 
+                                     2 * roomCapacity * sizeof(struct Room));
+                        if (temp_rooms == NULL) {
+                            printf("Error in do_load(): realloc failure\n");
+                        } else {
+                            floor->rooms = temp_rooms;
+                            roomCapacity = roomCapacity * 2;
+                        }
+                    }
+                    place_room(floor, &temp_room);
                     break;
             }
         }
         i++;
     }
-
-    free(marker_buff);
-    free(version_buff);
-    free(size_buff);
-    free(temp_room);
     
     fclose(f);
     return 0;
@@ -761,16 +765,12 @@ int do_save(struct Floor *floor) {
 
 int main(int argc, char *argv[])
 {
-    if (argc > 2) {
-        printf("Usage: ./dungeon [--save] [--load]\n");
-        return 0;
-    }
     srand(time(NULL));
-    struct Floor *newFloor = (struct Floor *) malloc(sizeof(struct Floor));
+    struct Floor newFloor;
     
     int save = 0;
     int load = 0;
-    int fname_arg = 0;
+    //int fname_arg = 0; //TODO implement file name arguments
 
     int argNum = 1;
     for (argNum = 1; argNum < argc; argNum++) {
@@ -783,27 +783,32 @@ int main(int argc, char *argv[])
             load = 1;
         } else if (!strcmp(argv[argNum], "--l")) {
             load = 1;
+        } else if (!strcmp(argv[argNum], "--DEBUG")) {
+            debug_output = 1;
+        } else {
+            printf("Invalid argument, Usage: ./dungeon [--save] [--load] [--DEBUG]\n");
+            return 0;
         }
     }
 
     if (load) {
-        do_load(newFloor); 
+        do_load(&newFloor, RPATH); 
         printf("LOAD DUNGEON\n");
     } else { 
-        init_floor(newFloor);
-        add_rooms(newFloor);
-        add_corridors(newFloor);
+        init_floor(&newFloor);
+        add_rooms(&newFloor);
+        add_corridors(&newFloor);
     } 
-    if (debug_output) { debug_floor(newFloor); }
-    print_floor(newFloor);
+    if (debug_output) { debug_floor(&newFloor); }
+    print_floor(&newFloor);
     printf("Press Enter to Exit:\n");
     getchar();
     
     if (save) {
-        do_save(newFloor);
+        do_save(&newFloor);
         printf("SAVE DUNGEON\n");
     }
 
-    delete_floor(newFloor);
+    delete_floor(&newFloor);
     return 0;
 }

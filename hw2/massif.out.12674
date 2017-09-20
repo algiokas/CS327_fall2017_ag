@@ -1,0 +1,709 @@
+desc: (none)
+cmd: ./dungeon
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=146081
+mem_heap_B=13720
+mem_heap_extra_B=40
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=340047
+mem_heap_B=13736
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=425917
+mem_heap_B=54076
+mem_heap_extra_B=156
+mem_stacks_B=0
+heap_tree=detailed
+n8: 54076 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n0: 316 in 7 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=4
+#-----------
+time=554004
+mem_heap_B=54260
+mem_heap_extra_B=1076
+mem_stacks_B=0
+heap_tree=detailed
+n8: 54260 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n0: 500 in 7 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=5
+#-----------
+time=677255
+mem_heap_B=54300
+mem_heap_extra_B=1276
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=827721
+mem_heap_B=54324
+mem_heap_extra_B=1396
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=1023798
+mem_heap_B=54260
+mem_heap_extra_B=1076
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=1175704
+mem_heap_B=54152
+mem_heap_extra_B=536
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=1376842
+mem_heap_B=54312
+mem_heap_extra_B=1336
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=1486442
+mem_heap_B=54320
+mem_heap_extra_B=1376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=1650958
+mem_heap_B=54356
+mem_heap_extra_B=1556
+mem_stacks_B=0
+heap_tree=detailed
+n8: 54356 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n0: 596 in 8 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=12
+#-----------
+time=1764229
+mem_heap_B=54360
+mem_heap_extra_B=1576
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=1907437
+mem_heap_B=54352
+mem_heap_extra_B=1536
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=2021678
+mem_heap_B=54296
+mem_heap_extra_B=1256
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=2128778
+mem_heap_B=54296
+mem_heap_extra_B=1256
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=2238675
+mem_heap_B=54280
+mem_heap_extra_B=1176
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=2347435
+mem_heap_B=54192
+mem_heap_extra_B=736
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=2544569
+mem_heap_B=54176
+mem_heap_extra_B=656
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=2710941
+mem_heap_B=54200
+mem_heap_extra_B=776
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=2897766
+mem_heap_B=54340
+mem_heap_extra_B=1476
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=3038635
+mem_heap_B=54356
+mem_heap_extra_B=1556
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=3209768
+mem_heap_B=54324
+mem_heap_extra_B=1396
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=3379354
+mem_heap_B=54332
+mem_heap_extra_B=1436
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=3548861
+mem_heap_B=54228
+mem_heap_extra_B=916
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=3653776
+mem_heap_B=54172
+mem_heap_extra_B=636
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=3806869
+mem_heap_B=54200
+mem_heap_extra_B=776
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=3905890
+mem_heap_B=54288
+mem_heap_extra_B=1216
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=4018307
+mem_heap_B=54552
+mem_heap_extra_B=2536
+mem_stacks_B=0
+heap_tree=detailed
+n8: 54552 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n0: 792 in 8 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=29
+#-----------
+time=4145617
+mem_heap_B=54648
+mem_heap_extra_B=3016
+mem_stacks_B=0
+heap_tree=peak
+n9: 54648 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 576 0x10B39D: insert (pqueue.c:117)
+  n0: 576 in 5 places, all below massif's threshold (1.00%)
+ n0: 312 in 7 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=30
+#-----------
+time=4349988
+mem_heap_B=54616
+mem_heap_extra_B=2856
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=4471691
+mem_heap_B=54648
+mem_heap_extra_B=3016
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=4569025
+mem_heap_B=54592
+mem_heap_extra_B=2736
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=4695599
+mem_heap_B=54520
+mem_heap_extra_B=2376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=4820577
+mem_heap_B=54440
+mem_heap_extra_B=1976
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=4939282
+mem_heap_B=54400
+mem_heap_extra_B=1776
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=5061170
+mem_heap_B=54300
+mem_heap_extra_B=1276
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=5182752
+mem_heap_B=54236
+mem_heap_extra_B=956
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=5273739
+mem_heap_B=54172
+mem_heap_extra_B=636
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=5395820
+mem_heap_B=54196
+mem_heap_extra_B=756
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=5532687
+mem_heap_B=54196
+mem_heap_extra_B=756
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=5623807
+mem_heap_B=54264
+mem_heap_extra_B=1096
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=5745646
+mem_heap_B=54396
+mem_heap_extra_B=1756
+mem_stacks_B=0
+heap_tree=detailed
+n8: 54396 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n0: 636 in 8 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=43
+#-----------
+time=5836940
+mem_heap_B=54368
+mem_heap_extra_B=1616
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=5961990
+mem_heap_B=54076
+mem_heap_extra_B=156
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=6053068
+mem_heap_B=54312
+mem_heap_extra_B=1336
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=6175685
+mem_heap_B=54348
+mem_heap_extra_B=1516
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=6296799
+mem_heap_B=54384
+mem_heap_extra_B=1696
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=6449781
+mem_heap_B=54484
+mem_heap_extra_B=2196
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=6541659
+mem_heap_B=54452
+mem_heap_extra_B=2036
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=6627699
+mem_heap_B=54296
+mem_heap_extra_B=1256
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=6713655
+mem_heap_B=54124
+mem_heap_extra_B=396
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=6799708
+mem_heap_B=54416
+mem_heap_extra_B=1856
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=6886311
+mem_heap_B=54500
+mem_heap_extra_B=2276
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=6972323
+mem_heap_B=54540
+mem_heap_extra_B=2476
+mem_stacks_B=0
+heap_tree=detailed
+n8: 54540 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n0: 780 in 8 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=55
+#-----------
+time=7059128
+mem_heap_B=54500
+mem_heap_extra_B=2276
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=7145566
+mem_heap_B=54520
+mem_heap_extra_B=2376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=7231469
+mem_heap_B=54532
+mem_heap_extra_B=2436
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=7317460
+mem_heap_B=54484
+mem_heap_extra_B=2196
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=7403833
+mem_heap_B=54472
+mem_heap_extra_B=2136
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=7490217
+mem_heap_B=54456
+mem_heap_extra_B=2056
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=7577023
+mem_heap_B=54424
+mem_heap_extra_B=1896
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=7663144
+mem_heap_B=54388
+mem_heap_extra_B=1716
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=7749394
+mem_heap_B=54452
+mem_heap_extra_B=2036
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=7835549
+mem_heap_B=54416
+mem_heap_extra_B=1856
+mem_stacks_B=0
+heap_tree=detailed
+n8: 54416 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 13440 0x10AEC6: init_PQ (pqueue.c:22)
+  n1: 13440 0x1093D9: dijkstra_path (dungeon.c:275)
+   n1: 13440 0x109EC2: add_corridors (dungeon.c:443)
+    n0: 13440 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109395: dijkstra_path (dungeon.c:271)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093A3: dijkstra_path (dungeon.c:272)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x1093B1: dijkstra_path (dungeon.c:273)
+  n1: 6720 0x109EC2: add_corridors (dungeon.c:443)
+   n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109D60: add_corridors (dungeon.c:427)
+  n0: 6720 0x10ADF7: main (dungeon.c:795)
+ n1: 6720 0x109F5D: init_floor (dungeon.c:468)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n1: 6720 0x109F72: init_floor (dungeon.c:469)
+  n0: 6720 0x10ADDF: main (dungeon.c:793)
+ n0: 656 in 8 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=65
+#-----------
+time=7921697
+mem_heap_B=54352
+mem_heap_extra_B=1536
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=8259163
+mem_heap_B=15768
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
