@@ -1,0 +1,16 @@
+Alex Giokas
+Com S 327
+Homework 3 Readme
+
+- Dungeon distance maps are fully implemented at time of writing
+
+- I didn't implement a switch to place the PC at a specific location. on line 564 of dungeon.c
+  there is a commented line that should allow you to place the PC at a specific location (sorry)
+
+- I have implemented a --DEBUG switch that will output all of the optional debug output in the code
+  some of it is more readable than some other parts, but it's mainly for my personal use
+
+- I've updated and cleaned up my makefile and added some additional functionality and flexibility
+
+- The makefile has a clean macro that will remove everything but source and header files by running
+  "make clean" (no quotes) on the command line

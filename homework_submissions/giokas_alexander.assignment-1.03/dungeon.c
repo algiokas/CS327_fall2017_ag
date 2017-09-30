@@ -560,6 +560,8 @@ int spawn_pc(struct Floor *floor) {
 
     int pc_loc = INDEX2D(pc_x, pc_y);
     floor->pc_loc = pc_loc;
+
+    //floor->pc_loc = INDEX2D(y, x); //for placing the PC at a specific location
     return 0;
 }
 
