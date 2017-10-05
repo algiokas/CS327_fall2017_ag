@@ -11,39 +11,15 @@
 #include "dungeon.h"
 #include "pqueue.h"
 
-#define FWIDTH  80 //floor width
-#define FHEIGHT 21 //floor height
 
-#define MINROOMS  5 //minimum rooms per floor as per assignment spec
-#define MAXROOMS  15 //arbitrary upper bound 
-#define MINROOMWIDTH 3 //minimum width of a room
-#define MINROOMHEIGHT 2 //minimum height of a room
-#define ROOMDENSITY 0.12 //the fraction of the floor that must be rooms
+int floor_debug = 0;
 
-#define HMODVAL 100 //indicates how much the corridor pathfinding should avoid rooms
-
-#define RPATH "/.rlg327/dungeon" //the relative path from the home directory to the save/load file
-#define PVERSION 0 //the program version
-
-//converts the 2D representation of a location into a linear array index
-#define INDEX2D(x, y) (FWIDTH * y) + x 
-
-int debug_output = 0;
-
-//Inline min and max functions to avoid some issues with the corresponding macros
-inline int min(int a, int b) {
-    if (a > b) {
-        return b;
-    }
-    return a;
+//
+void set_floor_debug(int i)
+{
+    floor_debug = i;
 }
 
-inline int max(int a, int b) {
-    if (a > b) {
-        return a;
-    }
-    return b;
-}
 
 //gives an edge weight for our pathfinding algorithm based on the hardness of the destination
 inline int pf_weight(int hardness) {
@@ -71,11 +47,11 @@ int edit_cell(struct Floor *floor, int x_loc, int y_loc, CType input_type, int i
 {
     
     if (!floor) {
-        if (debug_output) { printf("edit_cell() error - Floor not Initalized"); }
+        if (floor_debug) { printf("edit_cell() error - Floor not Initalized"); }
         return -1;
     }
     if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
-        if (debug_output) { printf("edit_cell() error - Index out of bounds"); }
+        if (floor_debug) { printf("edit_cell() error - Index out of bounds"); }
         return -1;
     }
     int cellIndex = (FWIDTH * y_loc) + x_loc;
@@ -97,11 +73,11 @@ int edit_cell(struct Floor *floor, int x_loc, int y_loc, CType input_type, int i
 CType get_type(struct Floor *floor, int x_loc, int y_loc)
 {
     if (!floor) {
-        if (debug_output) { printf("get_type() error - Floor not Initalized"); }
+        if (floor_debug) { printf("get_type() error - Floor not Initalized"); }
         return error_c;
     }
     if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
-        if (debug_output) { printf("get_type() error - Index out of bounds"); }
+        if (floor_debug) { printf("get_type() error - Index out of bounds"); }
         return error_c;
     }
     int cellIndex = (FWIDTH * y_loc) + x_loc;
@@ -124,11 +100,11 @@ int get_hardness(struct Floor *floor, int x_loc, int y_loc)
 {
     if (!floor) {
 
-        if (debug_output) { printf("get_hardness() error - Floor not Initalized"); }
+        if (floor_debug) { printf("get_hardness() error - Floor not Initalized"); }
         return -1;
     }
     if (x_loc >= FWIDTH || y_loc >= FHEIGHT) {
-        if (debug_output) { printf("get_hardness() error - Floor not Initalized"); }
+        if (floor_debug) { printf("get_hardness() error - Floor not Initalized"); }
         return -1;
     }
     int cellIndex = (FWIDTH * y_loc) + x_loc;
@@ -146,7 +122,7 @@ int get_hardness(struct Floor *floor, int x_loc, int y_loc)
 */
 int place_room(struct Floor *floor, struct Room *room)
 {
-    if (debug_output) { printf("Placing Room...\n"); }
+    if (floor_debug) { printf("Placing Room...\n"); }
     int row, col;
     for (col = room->loc.y; col < room->loc.y + room->dims.y; col++) {
         for (row = room->loc.x; row < room->loc.x + room->dims.x; row++) {
@@ -168,7 +144,7 @@ int place_room(struct Floor *floor, struct Room *room)
 */
 int check_intersection(struct Floor *floor, struct Room * room)
 {
-    if (debug_output) { printf("Checking Intersection...\n"); }
+    if (floor_debug) { printf("Checking Intersection...\n"); }
     if (!floor->numRooms) {
         return 0;
     }
@@ -209,7 +185,7 @@ int check_intersection(struct Floor *floor, struct Room * room)
  */
 int add_rooms(struct Floor *floor)
 {
-    if (debug_output) { printf("Adding Rooms...\n"); }
+    if (floor_debug) { printf("Adding Rooms...\n"); }
     double floorsize = floor->width * floor->height;
     double freespace = floorsize; //the total amount of free space within which to place rooms
     int roomIter = 0;
@@ -244,14 +220,39 @@ int add_rooms(struct Floor *floor)
             freespace -= roomsize; //and subtract it from free space
             roomIter++;
         }
-        if (debug_output) { printf("Current room density: %f\n", (freespace / floorsize)); }
+        if (floor_debug) { printf("Current room density: %f\n", (freespace / floorsize)); }
     }
     return 0;
 }
 
+int get_neighbors(int index, int *n)
+{
+    
+    int left = index - 1;
+    int top = index - FWIDTH;
+    int right = index + 1;
+    int bottom = index + FWIDTH;
+    int topleft = top - 1;
+    int topright = top + 1;
+    int botright = bottom + 1;
+    int botleft = bottom - 1;
+        
+    *n = left;
+    *(n+1) = topleft;
+    *(n+2) = top;
+    *(n+3) = topright;
+    *(n+4) = right;
+    *(n+5) = botright;
+    *(n+6) = bottom; 
+    *(n+7) = botleft;
+
+    return 0;
+}
+    
+
 int dijkstra_map(struct Floor *floor, tunnel_trait t)
 {
-    if (debug_output) { printf("Calculating Dijkstra Path...\n"); }
+    if (floor_debug) { printf("Calculating Distance Map...\n"); }
     int *dist;
     int *prev;
     int *visited;
@@ -287,6 +288,7 @@ int dijkstra_map(struct Floor *floor, tunnel_trait t)
     while(pq.size) { // queue is not empty
         remove_min(&pq, &out);
         current = out;
+        /*
         int left = current - 1;
         int top = current - FWIDTH;
         int right = current + 1;
@@ -295,12 +297,14 @@ int dijkstra_map(struct Floor *floor, tunnel_trait t)
         int topright = top + 1;
         int botright = bottom + 1;
         int botleft = bottom - 1;
+        */
         
         //array of neighbors for iteration
-        int n[8] = {left, topleft, top, topright, right, botright, bottom, botleft};
+        int n[8];
+        get_neighbors(current, n);
         int eweight = pf_weight(floor->hard_map[current]);
         
-        if (debug_output) {printf("(%d, %d)\n", floor->hard_map[current], eweight); }
+        if (floor_debug) {printf("(%d, %d)", floor->hard_map[current], eweight); }
         int i;
         for (i = 0; i < 8; i++) {
             if (eweight != INT_MAX && (floor->hard_map[n[i]] == 0 || t == tunneling)) {
@@ -315,6 +319,7 @@ int dijkstra_map(struct Floor *floor, tunnel_trait t)
                 }
             }
         }
+        if(floor_debug) { printf("\n"); }
     }
     if (current == -1) {
         printf("dijkstra_map() error : queue failure\n");
@@ -363,7 +368,7 @@ int dijkstra_map(struct Floor *floor, tunnel_trait t)
  */
 int dijkstra_corridor(struct Floor *floor, struct Duo source, struct Duo target, int *path)
 {
-    if (debug_output) { printf("Calculating Dijkstra Path...\n"); }
+    if (floor_debug) { printf("Calculating Dijkstra Path...\n"); }
     int *dist;
     int *prev;
     int *visited;
@@ -380,7 +385,7 @@ int dijkstra_corridor(struct Floor *floor, struct Duo source, struct Duo target,
     visited = (int*) malloc(FWIDTH * FHEIGHT * sizeof(int));
     init_PQ(&pq, (FWIDTH * FHEIGHT / 2), sizeof(int));
 
-    if (debug_output) { printf("DPATH: source=%d, target=%d\n" ,sourceIndex, targetIndex); }
+    if (floor_debug) { printf("DPATH: source=%d, target=%d\n" ,sourceIndex, targetIndex); }
 
     //dist: set values to "Infinity" (INT_MAX) for all nodes except source, which is set to 0
     //visited: set values to 0 for all nodes except source, which is set to 1
@@ -466,7 +471,7 @@ int dijkstra_corridor(struct Floor *floor, struct Duo source, struct Duo target,
         printf("dijkstra_corridor() error : queue failure\n");
         return -1;
     }
-    if (debug_output) { printf("Constructing path from %d to %d\n", current, sourceIndex); }
+    if (floor_debug) { printf("Constructing path from %d to %d\n", current, sourceIndex); }
     int pathIter = 1;
     path[0] = current;
     while (prev[current] != sourceIndex && pathIter < 100) {
@@ -495,9 +500,9 @@ int dijkstra_corridor(struct Floor *floor, struct Duo source, struct Duo target,
 */
 int draw_path(struct Floor *floor, int len, int *path)
 {
-    if (debug_output) { printf("Drawing Path...\n"); }
+    if (floor_debug) { printf("Drawing Path...\n"); }
     if (!path) {
-        if (debug_output) { printf("draw_path() error: Invalid path argument\n"); }
+        if (floor_debug) { printf("draw_path() error: Invalid path argument\n"); }
         return 1;
     }
     int iter = 0;
@@ -524,7 +529,7 @@ int draw_path(struct Floor *floor, int len, int *path)
 */
 int add_corridors(struct Floor *floor)
 {
-    if (debug_output) {
+    if (floor_debug) {
         printf("Adding Corridors...\n");
         printf("NumRooms: %d\n", floor->numRooms);
     }
@@ -539,7 +544,7 @@ int add_corridors(struct Floor *floor)
         } else {
             nextRoom = roomIter + 1;
         }
-        if (debug_output) { printf("Room %d to %d path\n", roomIter, nextRoom); }
+        if (floor_debug) { printf("Room %d to %d path\n", roomIter, nextRoom); }
 
         roomACentroid.x = floor->rooms[roomIter].loc.x + (floor->rooms[roomIter].dims.x / 2);
         roomACentroid.y = floor->rooms[roomIter].loc.y + (floor->rooms[roomIter].dims.y / 2);
@@ -578,7 +583,7 @@ int spawn_pc(struct Floor *floor) {
 */
 int init_floor(struct Floor *newFloor)
 {
-    if (debug_output) { printf("Initializing Floor...\n"); }
+    if (floor_debug) { printf("Initializing Floor...\n"); }
     newFloor->width = FWIDTH;
     newFloor->height = FHEIGHT;
     newFloor->numRooms = 0;
@@ -616,7 +621,7 @@ int init_floor(struct Floor *newFloor)
 */
 int delete_floor(struct Floor *floor)
 {
-    if (debug_output) { printf("Deleting Floor...\n"); }
+    if (floor_debug) { printf("Deleting Floor...\n"); }
     free(floor->rooms);
     free(floor->type_map);
     free(floor->hard_map);
@@ -735,7 +740,7 @@ int debug_floor(struct Floor *floor) {
 }
  
 int do_load(struct Floor *floor, char *filename) {
-    if (debug_output) { printf("Loading from file...\n"); }
+    if (floor_debug) { printf("Loading from file...\n"); }
 
     char *home; //will be the path of the home directory
     char *rpath; //the path from the home dir to the file
@@ -890,7 +895,7 @@ size_t write_bigendian(const void *ptr, size_t size, size_t nmemb, FILE *stream)
     
     
 int do_save(struct Floor *floor) {
-    if (debug_output) { printf("Saving to file...\n"); }
+    if (floor_debug) { printf("Saving to file...\n"); }
     
     char *home; //will be the path of the home directory
     char *rpath; //the path from the home dir to the file
@@ -934,61 +939,5 @@ int do_save(struct Floor *floor) {
     }
     
     fclose(f);
-    return 0;
-}
-
-int main(int argc, char *argv[])
-{
-    srand(time(NULL));
-    struct Floor newFloor;
-    
-    int save = 0;
-    int load = 0;
-    //int fname_arg = 0; //TODO implement file name arguments
-
-    int argNum = 1;
-    for (argNum = 1; argNum < argc; argNum++) {
-        if (debug_output) { printf("Arg %d: %s \n", argNum, argv[argNum]); }
-        if (!strcmp(argv[argNum], "--save")) {
-            save = 1;
-        } else if (!strcmp(argv[argNum], "--s")) {
-            save = 1;
-        } else if (!strcmp(argv[argNum], "--load")) {
-            load = 1;
-        } else if (!strcmp(argv[argNum], "--l")) {
-            load = 1;
-        } else if (!strcmp(argv[argNum], "--DEBUG")) {
-            debug_output = 1;
-        } else {
-            printf("Invalid argument, Usage: ./dungeon [--save] [--load] [--DEBUG]\n");
-            return 0;
-        }
-    }
-    
-    if (load) {
-        do_load(&newFloor, RPATH); 
-        spawn_pc(&newFloor);
-        printf("LOAD DUNGEON\n");
-    } else { 
-        init_floor(&newFloor);
-        add_rooms(&newFloor);
-        add_corridors(&newFloor);
-        spawn_pc(&newFloor);
-    } 
-    if (debug_output) { debug_floor(&newFloor); }
-    dijkstra_map(&newFloor, non_tunneling);
-    dijkstra_map(&newFloor, tunneling);
-    print_floor(&newFloor);
-    print_dist(&newFloor, non_tunneling);
-    print_dist(&newFloor, tunneling);
-    printf("Press Enter to Exit:\n");
-    getchar();
-    
-    if (save) {
-        do_save(&newFloor);
-        printf("SAVE DUNGEON\n");
-    }
-
-    delete_floor(&newFloor);
     return 0;
 }

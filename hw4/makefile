@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -g -Wall -Werror -ggdb -O2
-OBJECTS = dungeon.o pqueue.o
+OBJECTS = dungeon.o pqueue.o main.o
 
 dungeon : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o dungeon

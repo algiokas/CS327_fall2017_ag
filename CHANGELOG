@@ -193,3 +193,28 @@ Primary Changelog
 - added parsing for a '--DEBUG' switch which turns on all debug text in my code
 
 - removed some unused variables
+
+10/3/2017
+-------------------
+- Created main.c file, moved main function from dungeon.c to main.c
+
+- moved all define macros from dungeon.c to dungeon.h
+
+- changed min and max functions to min_int and max_int and moved both function definitions to 
+  dungeon.h (note: functions are both inline)
+
+- added declarations for all functions in dungeon.c too dungeon.h, some functions might not be
+  needed outside the scope of dungeon.c but this is something I can deal with later. for now, all
+  dungeon.c functions are visible through dungeon.h
+
+- changed global variable debug_output to floor_debug and replaced all related calls, then created
+  associated function set_floor_debug to allow main.c  to set the value of floor_debug
+
+- in main.c, debug_output is now a local variable in main() that is then used as an argument for
+  set_floor_debug and to optionally call other debugging functions such as debug_floor() from main
+
+- no functionality added through these changes, however the structure of the program should
+  hopefully be more logical
+
+10/4/2017
+------------------
