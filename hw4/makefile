@@ -11,4 +11,4 @@ dungeon : $(OBJECTS)
 .PHONY : clean
 
 clean :
-	rm dungeon $(OBJECTS)
+	rm $(OBJECTS)
