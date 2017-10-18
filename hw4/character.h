@@ -4,12 +4,20 @@
 
 #include "dungeon.h"
 
+struct Floor;
+struct NPC;
+struct PC;
+
 struct Character {
-    int x_pos;
-    int y_pos;
+    struct Duo loc;
     int speed;
     char symbol;
-    int living;
+    int alive;
+	int seq_num; //sequence number
+	struct NPC *npc;
+	struct PC *pc;
 }
+
+
 
 

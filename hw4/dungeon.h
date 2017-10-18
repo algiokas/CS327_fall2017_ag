@@ -1,3 +1,9 @@
+/*  Dungeon.h : Alex Giokas
+    Iowa State University - Com Sci 327 - Fall 2017
+    Header file for dungeon.c - contains constants and structs that pertain
+	to dungeon generation, saving, loading and manipulating the state of a
+	floor in the dungeon */
+
 #ifndef DUNGEON_H
 
 #define DUNGEON_H
@@ -12,9 +18,6 @@
 #define MINROOMWIDTH 3 //minimum width of a room
 #define MINROOMHEIGHT 2 //minimum height of a room
 #define ROOMDENSITY 0.12 //the fraction of the floor that must be rooms
-
-//Corridor generation values
-#define HMODVAL 100 //indicates how much the corridor pathfinding should avoid rooms
 
 //File IO values
 #define RPATH "/.rlg327/dungeon" //the relative path from the home directory to the save/load file
@@ -97,10 +100,6 @@ int check_intersection(struct Floor *floor, struct Room * room);
 int add_rooms(struct Floor *floor);
 
 int get_neighbors(int index, int *n);
-
-int dijkstra_map(struct Floor *floor, tunnel_trait t);
-
-int dijkstra_corridor(struct Floor *floor, struct Duo source, struct Duo target, int *path);
 
 int draw_path(struct Floor *floor, int len, int *path);
 

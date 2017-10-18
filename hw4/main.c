@@ -10,6 +10,7 @@
 
 #include "dungeon.h"
 #include "pqueue.h"
+#include "path.h"
 
 
 int main(int argc, char *argv[])
@@ -21,6 +22,9 @@ int main(int argc, char *argv[])
     int save = 0;
     int load = 0;
     //int fname_arg = 0; //TODO implement file name arguments
+	
+	char *next;
+	int monsters = 0;
 
     int argNum = 1;
     for (argNum = 1; argNum < argc; argNum++) {
@@ -35,8 +39,20 @@ int main(int argc, char *argv[])
             load = 1;
         } else if (!strcmp(argv[argNum], "--DEBUG")) {
             debug_output = 1;
+		} else if (!strcmp(argv[argNum], "--nummon")) {
+			if (argNum + 1 >= argc) {
+				printf("Invalid argument: --nummon requires additional numeric argument\n");
+				break;
+			} else {
+				next = argv[argNum + 1];
+				monsters = atoi(next);
+				if (!monsters) {
+					printf("Invalid argument: --nummon requires additional numeric argument\n");
+					break;
+				}
+			}
         } else {
-            printf("Invalid argument, Usage: ./dungeon [--save] [--load] [--DEBUG]\n");
+            printf("Invalid argument\n");
             return 0;
         }
     }
@@ -54,11 +70,7 @@ int main(int argc, char *argv[])
         spawn_pc(&newFloor);
     } 
     if (debug_output) { debug_floor(&newFloor); }
-    dijkstra_map(&newFloor, non_tunneling);
-    dijkstra_map(&newFloor, tunneling);
     print_floor(&newFloor);
-    print_dist(&newFloor, non_tunneling);
-    print_dist(&newFloor, tunneling);
     printf("Press Enter to Exit:\n");
     getchar();
     
