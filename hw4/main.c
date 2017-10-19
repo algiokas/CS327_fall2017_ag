@@ -7,6 +7,7 @@
 #include <time.h>
 #include <limits.h>
 #include <string.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "pqueue.h"
@@ -70,7 +71,10 @@ int main(int argc, char *argv[])
         spawn_pc(&newFloor);
     } 
     if (debug_output) { debug_floor(&newFloor); }
-    print_floor(&newFloor);
+	
+	initscr();
+	display_floor(&newFloor);
+    
     printf("Press Enter to Exit:\n");
     getchar();
     

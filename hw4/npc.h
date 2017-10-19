@@ -43,7 +43,7 @@ struct Dungeon;
 struct Character;
 
 struct NPC {
-	int characteristics;
+	//int characteristics;
 	int aggro;
 	//the currently known PC position, for telepathic monsters this is the actual
 	//position of the PC, for all other monsters it is the last known position

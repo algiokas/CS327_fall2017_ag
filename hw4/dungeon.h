@@ -24,7 +24,8 @@
 #define PVERSION 0 //the program version
 
 //converts the 2D representation of a location into a linear array index
-#define INDEX2D(x, y) (FWIDTH * y) + x 
+#define INDEX2D(x, y) (FWIDTH * y) + x
+#define LINEARX(idx) 
 
 //A simple struct to store two integers together
 struct Duo {
@@ -59,6 +60,10 @@ struct Floor {
     int *hard_map;
     int *dist_map;
     int *dist_map_tunnel;
+	
+	struct Character **char_map;
+	struct PC pc;
+	int num_monsters;
 };
 
 //tunneling trait, currently used to control pathfinding algorithm, will eventually
@@ -104,8 +109,6 @@ int get_neighbors(int index, int *n);
 int draw_path(struct Floor *floor, int len, int *path);
 
 int add_corridors(struct Floor *floor);
-
-int spawn_pc(struct Floor *floor);
 
 int init_floor(struct Floor *newFloor);
 

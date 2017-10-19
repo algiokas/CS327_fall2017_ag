@@ -7,6 +7,7 @@
 #include <time.h>
 #include <limits.h>
 #include <string.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "pqueue.h"
@@ -76,6 +77,7 @@ CType get_type(struct Floor *floor, int x_loc, int y_loc)
 
     return floor->type_map[cellIndex];
 }
+
 
 
 /*  Function get_hardness
@@ -314,17 +316,6 @@ int add_corridors(struct Floor *floor)
     return 0;
 }
 
-int spawn_pc(struct Floor *floor) {
-    int rnum = rand() % floor->numRooms;
-    int pc_x = floor->rooms[rnum].loc.x + (rand() % floor->rooms[rnum].dims.x);
-    int pc_y = floor->rooms[rnum].loc.y + (rand() % floor->rooms[rnum].dims.y);
-
-    int pc_loc = INDEX2D(pc_x, pc_y);
-    floor->pc_loc = pc_loc;
-    return 0;
-}
-
-
     
 
 /*  Function: init_floor 
@@ -385,6 +376,8 @@ int delete_floor(struct Floor *floor)
     return 0;
 }
 
+//prints distance maps either tunneling or non-tunneling based on the parameter t
+//used only for homework 3
 int print_dist(struct Floor *floor, tunnel_trait t)
 {
     int row, col, dash, idx;
@@ -429,6 +422,7 @@ int print_dist(struct Floor *floor, tunnel_trait t)
     printf("\n");
     return 0;
 }
+
 /*  Function: print_floor
     ---------------------
     prints the map of a floor to the console with a border
@@ -477,6 +471,38 @@ int print_floor(struct Floor *floor)
         printf("-");
     }
     printf("\n");
+    return 0;
+}
+
+int display_floor(struct Floor *floor)
+{
+	int row, col, dash;
+	move(1, 0);
+    for (row = 0; row < FHEIGHT; row++) {
+        for (col = 0; col < FWIDTH; col++) {
+            if (INDEX2D(row, col) == floor->pc_loc) {
+                addch("@");
+            } else { 
+                switch(get_type(floor, row, col)) {
+                    case(immutable_c) :
+                        addch(' ');
+                        break;
+                    case(rock_c) :
+                        addch(' ');
+                        break;
+                    case(room_c) :
+                        addch('.');
+                        break;
+                    case(corridor_c) :
+                        addch('#');
+                        break;
+                    default :
+                        addch("X"); //indicates an error
+                }
+            }
+        }
+		move(row, 0);
+    }
     return 0;
 }
 
