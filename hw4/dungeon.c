@@ -221,7 +221,6 @@ int add_rooms(struct Floor *floor)
 
 int get_neighbors(int index, int *n)
 {
-    
     int left = index - 1;
     int top = index - FWIDTH;
     int right = index + 1;
