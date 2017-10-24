@@ -1,9 +1,9 @@
 CC = gcc
 CFLAGS = -g -Wall -Werror -ggdb -O2
-OBJECTS = dungeon.o pqueue.o main.o path.o pc.o
+OBJECTS = dungeon.o pqueue.o main.o
 
 dungeon : $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o dungeon -lncurses
+	$(CC) $(CFLAGS) $(OBJECTS) -o dungeon
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $<

@@ -1,6 +1,7 @@
+#include <stdlib.h>
+
 #include "pc.h"
 #include "dungeon.h"
-
 
 int spawn_pc(struct Floor *floor) {
     int rnum = rand() % floor->numRooms;
@@ -14,16 +15,14 @@ int spawn_pc(struct Floor *floor) {
 
 void pc_delete(struct PC *pc)
 {
-  if (pc) {
-    free(pc);
-  }
+    if (pc) {
+        free(pc);
+    }
 }
 
 int pc_is_alive(struct Floor *floor)
 {
-  return floor->pc.alive;
+    return 0;
 }
 
-int init_pc(struct Floor *floor)
-{
 	

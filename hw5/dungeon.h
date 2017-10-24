@@ -1,13 +1,6 @@
-/*  Dungeon.h : Alex Giokas
-    Iowa State University - Com Sci 327 - Fall 2017
-    Header file for dungeon.c - contains constants and structs that pertain
-	to dungeon generation, saving, loading and manipulating the state of a
-	floor in the dungeon */
-
 #ifndef DUNGEON_H
 
 #define DUNGEON_H
-
 
 //Floor dimensions
 #define FWIDTH  80 //floor width
@@ -20,16 +13,15 @@
 #define MINROOMHEIGHT 2 //minimum height of a room
 #define ROOMDENSITY 0.12 //the fraction of the floor that must be rooms
 
+//Corridor generation values
+#define HMODVAL 100 //indicates how much the corridor pathfinding should avoid rooms
+
 //File IO values
 #define RPATH "/.rlg327/dungeon" //the relative path from the home directory to the save/load file
 #define PVERSION 0 //the program version
 
 //converts the 2D representation of a location into a linear array index
-#define INDEX2D(x, y) (FWIDTH * y) + x
-#define LINEARX(idx) 
-
-struct PC;
-struct Character;
+#define INDEX2D(x, y) (FWIDTH * y) + x 
 
 //A simple struct to store two integers together
 struct Duo {
@@ -64,10 +56,6 @@ struct Floor {
     int *hard_map;
     int *dist_map;
     int *dist_map_tunnel;
-	
-	//struct Character **char_map;
-	//struct Character pc;
-	int num_monsters;
 };
 
 //tunneling trait, currently used to control pathfinding algorithm, will eventually
@@ -110,9 +98,15 @@ int add_rooms(struct Floor *floor);
 
 int get_neighbors(int index, int *n);
 
+int dijkstra_map(struct Floor *floor, tunnel_trait t);
+
+int dijkstra_corridor(struct Floor *floor, struct Duo source, struct Duo target, int *path);
+
 int draw_path(struct Floor *floor, int len, int *path);
 
 int add_corridors(struct Floor *floor);
+
+int spawn_pc(struct Floor *floor);
 
 int init_floor(struct Floor *newFloor);
 
@@ -121,8 +115,6 @@ int delete_floor(struct Floor *floor);
 int print_dist(struct Floor *floor, tunnel_trait t);
 
 int print_floor(struct Floor *floor);
-
-int display_floor(struct Floor *floor);
 
 int debug_floor(struct Floor *floor);
 
