@@ -6,9 +6,24 @@
 #include <vector>
 #include <byteswap.h>
 
+#include "PQueue.h"
 #include "Floor.h"
-#include "pqueue.h"
+#include "Character.h"
+#include "PC.h"
 
+enum direction {
+	north,
+	northeast,
+	east,
+	southeast,
+	south,
+	southwest,
+	west,
+	northwest
+};
+
+//array indices correspond to enum values, so if n = get_neighbors(x, y);
+//then n[north] is the index of the dungeon cell in the northern direction
 std::array<int, 8> get_neighbors(int x, int y)
 {
 	int index = index2d(x, y);
@@ -23,19 +38,19 @@ std::array<int, 8> get_neighbors(int x, int y)
 
 	std::array<int, 8> n;
 
-	n[0] = left;
-	n[1] = topleft;
-	n[2] = top;
-	n[3] = topright;
-	n[4] = right;
-	n[5] = botright;
-	n[6] = bottom;
-	n[7] = botleft;
+	n[0] = top;
+	n[1] = topright;
+	n[2] = right;
+	n[3] = botright;
+	n[4] = bottom;
+	n[5] = botleft;
+	n[6] = left;
+	n[7] = topleft;
 
 	return n;
 }
 
-Floor::Floor()
+Floor::Floor(PC* pc)
 {
 	width = FWIDTH;
 	height = FHEIGHT;
@@ -44,6 +59,8 @@ Floor::Floor()
 	num_monsters = 0;
 	max_monsters = 0;
 	time = 0;
+
+	this->pc = pc;
 
 	rooms = std::vector<struct room>();
 	type_map = std::array<CType, FWIDTH * FHEIGHT>();
@@ -56,18 +73,20 @@ Floor::Floor()
 	gen_rooms();
 	add_corridors();
 	duo spawn = rand_room_location();
-	spawn_pc(spawn.x, spawn.y);
+	place_pc(spawn.x, spawn.y);
 }
 
-Floor::Floor(std::string filename)
+Floor::Floor(PC* pc, std::string filename)
 {
 	width = FWIDTH;
 	height = FHEIGHT;
 	num_rooms = 0;
-	pc_loc = 0;
+	pc_loc = index2d(pc->x, pc->y);
 	num_monsters = 0;
 	max_monsters = 0;
 	time = 0;
+
+	this->pc = pc;
 
 	rooms = std::vector<struct room>();
 	type_map = std::array<CType, FWIDTH * FHEIGHT>();
@@ -78,7 +97,7 @@ Floor::Floor(std::string filename)
 
 	load_from_file(filename);
 	duo spawn = rand_room_location();
-	spawn_pc(spawn.x, spawn.y);
+	place_pc(spawn.x, spawn.y);
 }
 
 Floor::~Floor()
@@ -283,11 +302,13 @@ inline int pf_weight(int hardness) {
 
 std::vector<int> Floor::dijkstra_corridor(int source, int target)
 {
-	std::array<int, width * height> dist;
-	std::array<int, width * height> prev;
-	std::array<bool, width * height> visited;
+	std::array<int, FWIDTH * FHEIGHT> dist;
+	std::array<int, FWIDTH * FHEIGHT> prev;
+	std::array<bool, FWIDTH * FHEIGHT> visited;
 	std::vector<int> path;
+	
 	struct PQueue pq;
+
 	int current = -1;
 	int in;
 	int out;
@@ -541,6 +562,13 @@ void Floor::load_from_file(std::string filename)
 	}
 }
 
+void Floor::place_pc(int x, int y)
+{
+	pc_loc = index2d(x, y);
+	char_map[pc_loc] = pc;
+
+}
+
 void Floor::save_to_file()
 {
 	save_to_file(DEFAULT_FNAME);
@@ -591,9 +619,9 @@ void Floor::save_to_file(std::string filename)
 
 void Floor::update_dist(isTunneling t)
 {
-	std::array<int, width * height> dist;
-	std::array<int, width * height> prev;
-	std::array<bool, width * height> visited;
+	std::array<int, FWIDTH * FHEIGHT> dist;
+	std::array<int, FWIDTH * FHEIGHT> prev;
+	std::array<bool, FWIDTH * FHEIGHT> visited;
 	struct PQueue pq;
 	int current = -1;
 	int in;

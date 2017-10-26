@@ -1,4 +1,7 @@
 #include "io.h"
+#include "Floor.h"
+#include "PC.h"
+#include "NPC.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -6,8 +9,11 @@
 #include <ncurses.h>
 
 
-bool io_init_terminal()
+
+IO_handler::IO_handler(Floor *floor)
 {
+	this->f = floor;
+
 	initscr();
 	raw();
 	noecho();
@@ -21,16 +27,46 @@ bool io_init_terminal()
 	init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
 	init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
-	return true();
 }
 
-void io_reset_terminal()
+void IO_handler::display_message_queue(int x, int y)
+{
+}
+
+void IO_handler::display_monter_list()
+{
+}
+
+void IO_handler::scroll_monster_list()
+{
+}
+
+void IO_handler::display_map()
+{
+}
+
+
+
+IO_handler::~IO_handler()
 {
 	endwin();
 }
 
+void IO_handler::handle_input()
+{
+}
+
+void IO_handler::display_dungeon()
+{
+}
+
+void IO_handler::display()
+{
+}
+
 void io_handle_input()
 {
+	int fail_code;
 	int key;
 
 	do {
@@ -160,5 +196,3 @@ void io_handle_input()
 		}
 	} while (fail_code);
 }
-
-

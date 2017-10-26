@@ -73,39 +73,9 @@ inline int linearY(int index) { return (index / FWIDTH); }
 
 class Floor
 {
-private:
-	int width;
-	int height;
-	int num_rooms;
-	int pc_loc;
-	int num_monsters;
-	int max_monsters;
-	int time;
-
-	PC *pc;
-
-	std::vector<struct room> rooms;
-	std::array<CType, FWIDTH * FHEIGHT> type_map;
-	std::array<int, FWIDTH * FHEIGHT>  hard_map;
-	std::array<int, FWIDTH * FHEIGHT> dist_map;
-	std::array<int, FWIDTH * FHEIGHT> dist_map_tunnel;
-	std::array<Character *, FWIDTH * FHEIGHT> char_map;
-
-	void empty_floor();
-	void place_room(struct room *r);
-	bool check_intersection(struct room *r);
-	void gen_rooms();
-
-	std::vector<int> dijkstra_corridor(int source, int target);
-	void draw_path(std::vector<int> path);
-	void add_corridors();
-	void load_from_file(std::string filename);
-
-	void spawn_pc(int x, int y);
-
 public:
-	Floor();
-	Floor(std::string filename);
+	Floor(PC* pc);
+	Floor(PC* pc, std::string filename);
 	~Floor();
 
 	void set_cell_type(int x, int y, CType input_type);
@@ -127,7 +97,42 @@ public:
 	void save_to_file(std::string filename);
 
 	void update_dist(isTunneling t);
-	 
+
+private:
+	int width;
+	int height;
+	int num_rooms;
+	int pc_loc;
+	int num_monsters;
+	int max_monsters;
+	int time;
+
+	PC *pc;
+
+	std::vector<struct room> rooms;
+
+	//maps in Floor are generally stored as linear, but external entities access and modify
+	//these maps as if they are 2D (mostly). The internal arithmetica of this conversion is handled mostly
+	//using the index2d, linearX, and linearY inline functions
+	std::array<CType, FWIDTH * FHEIGHT> type_map;
+	std::array<int, FWIDTH * FHEIGHT>  hard_map;
+	std::array<int, FWIDTH * FHEIGHT> dist_map;
+	std::array<int, FWIDTH * FHEIGHT> dist_map_tunnel;
+	std::array<Character *, FWIDTH * FHEIGHT> char_map;
+
+	void empty_floor();
+	void place_room(struct room *r);
+	bool check_intersection(struct room *r);
+	void gen_rooms();
+
+	std::vector<int> dijkstra_corridor(int source, int target);
+	void draw_path(std::vector<int> path);
+	void add_corridors();
+	void load_from_file(std::string filename);
+
+	void place_pc(int x, int y);
+	//void gen_monsters();
+	//void check_visible(int pos_a, int pos_b);
 };
 
 #endif
