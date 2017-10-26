@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 
 //Floor dimensions
 const int FWIDTH = 80; //floor width
@@ -125,7 +126,9 @@ public:
 	Character *get_character(int x, int y);
 
 	duo rand_room_location();
+	void spawn_pc();
 	void print_floor();
+
 
 	void save_to_file();
 	void save_to_file(std::string filename);

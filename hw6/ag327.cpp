@@ -4,6 +4,7 @@
 #include <ctime>
 #include <sstream>
 #include <ncurses.h>
+#include <string.h>
 
 #include "PQueue.h"
 #include "Floor.h"
@@ -22,19 +23,19 @@ int main(int argc, char *argv[])
 
 	int argNum = 1;
 	for (argNum = 1; argNum < argc; argNum++) {
-		if (argv[argNum] == "--save") {
+		if (strcmp(argv[argNum], "--save")) {
 			save = 1;
 		}
-		else if (argv[argNum] == "--s") {
+		else if (strcmp(argv[argNum], "--s")) {
 			save = 1;
 		}
-		else if (argv[argNum] == "--load") {
+		else if (strcmp(argv[argNum], "--load")) {
 			load = 1;
 		}
-		else if (argv[argNum] == "--l") {
+		else if (strcmp(argv[argNum], "--l")) {
 			load = 1;
 		}
-		else if (argv[argNum], "--nummon") {
+		else if (strcmp(argv[argNum], "--nummon")) {
 			if (argNum + 1 >= argc) {
 				throw "Invalid argument: --nummon requires additional numeric argument";
 				break;
@@ -43,8 +44,9 @@ int main(int argc, char *argv[])
 				next = argv[argNum + 1];
 				std::stringstream ss;
 				ss << next;
-				ss >> next;
-				if (next <= 0) {
+				ss >> monsters;
+
+				if (monsters <= 0) {
 					throw "Invalid argument: --nummon requires additional numeric argument";
 					break;
 				}
@@ -59,12 +61,12 @@ int main(int argc, char *argv[])
 
 	if (load == 1) {
 		Floor *f = new Floor("dungeon");
+		duo pc_spawn = f->rand_room_location();
+		f->spawn_pc(pc_spawn.x, pc_spawn.y);
 	}
 	else {
 		Floor *f = new Floor();
-		spawn_pc(&newFloor);
 	}
-	if (debug_output) { debug_floor(&newFloor); }
 
 	initscr();
 	display_floor(&newFloor);
