@@ -1,4 +1,5 @@
 #include "io.h"
+#include "Floor.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -21,7 +22,7 @@ bool io_init_terminal()
 	init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
 	init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
-	return true();
+	return true;
 }
 
 void io_reset_terminal()
@@ -29,7 +30,7 @@ void io_reset_terminal()
 	endwin();
 }
 
-void io_handle_input()
+void io_handle_input(Floor *f)
 {
 	int key;
 
@@ -38,17 +39,17 @@ void io_handle_input()
 		case '7':
 		case 'y':
 		case KEY_HOME:
-			fail_code = move_pc(d, 7);
+			move_pc(d, 7);
 			break;
 		case '8':
 		case 'k':
 		case KEY_UP:
-			fail_code = move_pc(d, 8);
+			move_pc(d, 8);
 			break;
 		case '9':
 		case 'u':
 		case KEY_PPAGE:
-			fail_code = move_pc(d, 9);
+			move_pc(d, 9);
 			break;
 		case '6':
 		case 'l':
