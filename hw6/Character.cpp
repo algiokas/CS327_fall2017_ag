@@ -18,7 +18,7 @@ Character::~Character()
 
 char Character::symbol()
 {
-	return this->symbol;
+	return sym;
 }
 
 int Character::x()
@@ -34,7 +34,7 @@ int Character::y()
 
 int Character::speed()
 {
-	return this->speed;
+	return spd;
 }
 
 bool Character::is_alive()
@@ -45,16 +45,6 @@ bool Character::is_alive()
 int Character::sequence_num()
 {
 	return this->sequence_num;
-}
-
-bool Character::can_see(Floor * f, Character c)
-{
-	return false;
-}
-
-bool Character::attempt_move()
-{
-	return false;
 }
 
 void Character::kill()

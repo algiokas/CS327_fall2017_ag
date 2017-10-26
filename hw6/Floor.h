@@ -73,6 +73,31 @@ inline int linearY(int index) { return (index / FWIDTH); }
 
 class Floor
 {
+public:
+	Floor(PC* pc);
+	Floor(PC* pc, std::string filename);
+	~Floor();
+
+	void set_cell_type(int x, int y, CType input_type);
+	void set_cell_hardn(int x, int y, int input_hardn);
+	void set_cell_dist(int x, int y, int dist);
+	void set_cell_dist_tunnel(int x, int y, int dist);
+	void place_character(int x, int y, Character *c);
+
+	CType get_type(int x, int y);
+	int get_hardn(int x, int y);
+	int get_dist(int x, int y);
+	int get_dist_tunnel(int x, int y);
+	Character *get_character(int x, int y);
+
+	duo rand_room_location();
+	void print_floor();
+
+	void save_to_file();
+	void save_to_file(std::string filename);
+
+	void update_dist(isTunneling t);
+
 private:
 	int width;
 	int height;
@@ -85,6 +110,10 @@ private:
 	PC *pc;
 
 	std::vector<struct room> rooms;
+
+	//maps in Floor are generally stored as linear, but external entities access and modify
+	//these maps as if they are 2D (mostly). The internal arithmetica of this conversion is handled mostly
+	//using the index2d, linearX, and linearY inline functions
 	std::array<CType, FWIDTH * FHEIGHT> type_map;
 	std::array<int, FWIDTH * FHEIGHT>  hard_map;
 	std::array<int, FWIDTH * FHEIGHT> dist_map;
@@ -100,8 +129,6 @@ private:
 	void draw_path(std::vector<int> path);
 	void add_corridors();
 	void load_from_file(std::string filename);
-
-	void spawn_pc(int x, int y);
 
 public:
 	Floor();
@@ -130,6 +157,9 @@ public:
 
 	void update_dist(isTunneling t);
 	 
+	void place_pc(int x, int y);
+	//void gen_monsters();
+	//void check_visible(int pos_a, int pos_b);
 };
 
 #endif

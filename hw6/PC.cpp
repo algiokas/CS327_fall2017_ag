@@ -12,3 +12,7 @@ PC::PC(int x, int y)
 PC::~PC()
 {
 }
+
+void PC::attempt_move()
+{
+}

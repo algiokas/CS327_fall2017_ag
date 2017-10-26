@@ -9,6 +9,8 @@
 
 #include "PQueue.h"
 #include "Floor.h"
+#include "Character.h"
+#include "PC.h"
 
 
 int main(int argc, char *argv[])
@@ -59,27 +61,23 @@ int main(int argc, char *argv[])
 		}
 	}
 
-
+	Floor *f;
+	duo spawn_point = f->rand_room_location();
+	PC *player = new PC(spawn_point.x, spawn_point.y);
 	if (load == 1) {
-		Floor *f = new Floor("dungeon");
-		duo pc_spawn = f->rand_room_location();
-		f->spawn_pc(pc_spawn.x, pc_spawn.y);
+		f = new Floor(player, "dungeon");
 	}
 	else {
-		Floor *f = new Floor();
+		f = new Floor(player);
 	}
 
-	initscr();
-	display_floor(&newFloor);
-
-	printf("Press Enter to Exit:\n");
-	getchar();
+	f->print_floor();
 
 	if (save) {
-		do_save(&newFloor);
-		printf("SAVE DUNGEON\n");
+		f->save_to_file();
 	}
 
-	delete_floor(&newFloor);
+	delete f;
+	delete player;
 	return 0;
 }
