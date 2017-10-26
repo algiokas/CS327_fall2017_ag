@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CHARACTER_H
+
+#define CHARACTER_H
 
 #include "Floor.h"
 
@@ -29,3 +31,5 @@ public:
 	bool attempt_move();
 	void kill();
 };
+
+#endif

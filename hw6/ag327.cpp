@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <sstream>
+#include <string.h>
 #include <ncurses.h>
 #include <string.h>
 
