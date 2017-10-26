@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 
 //Floor dimensions
 const int FWIDTH = 80; //floor width
@@ -63,21 +64,12 @@ enum isTunneling {
 std::array<int, 8> get_neighbors(int x, int y);
 
 //converts the 2D representation of a location into a linear array index
-inline int index2d(int x, int y)
-{
-	return (FWIDTH * y) + x
-}
+inline int index2d(int x, int y) { return (FWIDTH * y) + x; }
 
 //converts a linear array index into either the x or y of its 2D representation
-inline int linearX(int index)
-{
-	return (index % FWIDTH)
-}
+inline int linearX(int index) { return (index % FWIDTH); }
 
-inline int linearY(int index)
-{
-	return (index / FWIDTH)
-}
+inline int linearY(int index) { return (index / FWIDTH); }
 
 class Floor
 {
@@ -89,6 +81,8 @@ private:
 	int num_monsters;
 	int max_monsters;
 	int time;
+
+	PC *pc;
 
 	std::vector<struct room> rooms;
 	std::array<CType, FWIDTH * FHEIGHT> type_map;
@@ -106,6 +100,8 @@ private:
 	void draw_path(std::vector<int> path);
 	void add_corridors();
 	void load_from_file(std::string filename);
+
+	void spawn_pc(int x, int y);
 
 public:
 	Floor();

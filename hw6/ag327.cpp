@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <sstream>
+#include <string.h>
 #include <ncurses.h>
 
 #include "PQueue.h"
@@ -22,19 +23,19 @@ int main(int argc, char *argv[])
 
 	int argNum = 1;
 	for (argNum = 1; argNum < argc; argNum++) {
-		if (argv[argNum] == "--save") {
+		if (strcmp(argv[argNum], "--save")) {
 			save = 1;
 		}
-		else if (argv[argNum] == "--s") {
+		else if (strcmp(argv[argNum], "--s")) {
 			save = 1;
 		}
-		else if (argv[argNum] == "--load") {
+		else if (strcmp(argv[argNum], "--load")) {
 			load = 1;
 		}
-		else if (argv[argNum] == "--l") {
+		else if (strcmp(argv[argNum], "--l")) {
 			load = 1;
 		}
-		else if (argv[argNum], "--nummon") {
+		else if (strcmp(argv[argNum],"--nummon")) {
 			if (argNum + 1 >= argc) {
 				throw "Invalid argument: --nummon requires additional numeric argument";
 				break;
@@ -62,9 +63,7 @@ int main(int argc, char *argv[])
 	}
 	else {
 		Floor *f = new Floor();
-		spawn_pc(&newFloor);
 	}
-	if (debug_output) { debug_floor(&newFloor); }
 
 	initscr();
 	display_floor(&newFloor);

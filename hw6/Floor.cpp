@@ -55,6 +55,8 @@ Floor::Floor()
 	empty_floor();
 	gen_rooms();
 	add_corridors();
+	duo spawn = rand_room_location();
+	spawn_pc(spawn.x, spawn.y);
 }
 
 Floor::Floor(std::string filename)
@@ -75,6 +77,8 @@ Floor::Floor(std::string filename)
 	char_map = std::array<Character *, FWIDTH * FHEIGHT>();
 
 	load_from_file(filename);
+	duo spawn = rand_room_location();
+	spawn_pc(spawn.x, spawn.y);
 }
 
 Floor::~Floor()
