@@ -6,18 +6,21 @@ class Character
 {
 private:
 	char symbol;
-	int position;
+	int x_pos;
+	int y_pos;
 	int speed;
 	bool alive;
 	int sequence_num;
 
 public:
-	Character(char sym, int pos, int spd, int sqnum);
+	Character() {}
+	Character(char sym, int x, int y, int spd, int sqnum);
 	virtual ~Character();
 
 	
 	char symbol();
-	int position();
+	int x();
+	int y();
 	int speed();
 	bool is_alive();
 	int sequence_num();

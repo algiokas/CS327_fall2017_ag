@@ -2,24 +2,35 @@
 
 
 
-Character::Character(char sym, int pos, int spd, int sqnum)
+Character::Character(char sym, int x, int y, int spd, int sqnum)
 {
 	this->symbol = sym;
-	this->position = pos;
+	x_pos = x;
+	y_pos = y;
 	this->speed = spd;
-	this->alive = true;
+	alive = true;
 	this->sequence_num = sqnum;
+}
+
+Character::~Character()
+{
 }
 
 char Character::symbol()
 {
-	return 0;
+	return this->symbol;
 }
 
-int Character::position()
+int Character::x()
 {
-	return this->position;
+	return x_pos;
 }
+
+int Character::y()
+{
+	return y_pos;
+}
+
 
 int Character::speed()
 {
@@ -28,7 +39,7 @@ int Character::speed()
 
 bool Character::is_alive()
 {
-	return this->alive;
+	return alive;
 }
 
 int Character::sequence_num()

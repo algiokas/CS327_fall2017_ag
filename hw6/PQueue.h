@@ -1,32 +1,39 @@
-#ifndef PQUEUE_H
+#ifndef PQUEUE_H 
 
 #define PQUEUE_H
 
-struct node
-{
-	int priority;
-	void *data;
-	struct node *next;
-	struct node *prev;
-};
+#include <vector>
 
-
+template<class DType>
 class PQueue
 {
 private:
-	node *front;
-	int element_size;
+	struct node {
+		int priority;
+		DType data;
+	};
+
+	std::vector<node> nodes;
 	int size;
 
+	inline int parent(int idx) { return (idx - 1) / 2; }
+	inline int left_child(int idx) { return (2 * idx) + 1; }
+	inline int right_child(int idx) { return (2 * idx) + 2; }
+	
+	void percolate_up(int node_index);
+	void percolate_down(int node_index);
+	int min_priority(int idxA, int idxB);
+
 public:
-	PQueue(int eSize);
+	PQueue();
 	~PQueue();
 
 	bool is_empty();
-	void insert();
-	void *remove_min();
-	void *peek_min();
-	void print();
+	void insert(int prio, DType data);
+	DType remove_min();
+	DType peek();
+	void print_queue();
+
 };
 
 #endif
