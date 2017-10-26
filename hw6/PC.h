@@ -1,10 +1,15 @@
 #pragma once
 #include "Character.h"
-class PC :
-	public Character
+
+const int pc_speed = 10;
+
+class PC : public Character
 {
+private:
+
 public:
-	PC();
+	PC(int x, int y);
 	~PC();
+
 };
 

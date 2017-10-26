@@ -7,31 +7,32 @@
 #include <string>
 #include <vector>
 
-
-
 //Floor dimensions
-#define FWIDTH  80 //floor width
-#define FHEIGHT 21 //floor height
+const int FWIDTH = 80; //floor width
+const int FHEIGHT = 21; //floor height
 
 //Room generation values
-#define MINROOMS  5 //minimum rooms per floor as per assignment spec
-#define MAXROOMS  15 //arbitrary upper bound 
-#define MINROOMWIDTH 3 //minimum width of a room
-#define MINROOMHEIGHT 2 //minimum height of a room
-#define ROOMDENSITY 0.12 //the fraction of the floor that must be rooms
+const int MINROOMS = 5; //minimum rooms per floor as per assignment spec
+const int MAXROOMS = 15; //arbitrary upper bound 
+const int MINROOMWIDTH = 3; //minimum width of a room
+const int MINROOMHEIGHT = 2; //minimum height of a room
+const double ROOMDENSITY = 0.12; //the fraction of the floor that must be rooms
 
 //File IO values
-#define RPATH "/.rlg327/" //the relative path from the home directory to the save/load file
-#define DEFAULT_FNAME "dungeon"
-#define FMARKER "RLG327"
-#define PVERSION 0 //the program version
+const std::string RPATH = "/.rlg327/"; //the relative path from the home directory to the save/load file
+const std::string DEFAULT_FNAME = "dungeon";
+const std::string FMARKER = "RLG327";
+const int PVERSION = 0; //the program version
 
-//converts the 2D representation of a location into a linear array index
-#define INDEX2D(x, y) (FWIDTH * y) + x
-
-//converts a linear array index into either the x or y of its 2D representation
-#define LINEARX(idx) (idx % FWIDTH)
-#define LINEARY(idx) (idx / FWIDTH)
+/* 	HMODVAL is a constant that is added to the hardness value of rooms
+	and corridors during corridor generation which essentially adds an
+	artificial bias of the alorithm against generating corridor cells in
+	rooms. Without this value (or with it set to 0), dijkstra_corridor()
+	will take a path that spends as little time carving out rock as possible.
+	However the higher the HMODVAL, the more attractive rock is compared to
+	rooms and corridors. This tends to cause the generated corridors to
+	meander more and creates more interesting dungeons. */
+	const int HMODVAL = 100;
 
 typedef enum cellType {
 	error_c,
@@ -53,7 +54,30 @@ struct room {
 	struct duo dims;
 };
 
+enum isTunneling {
+	non_tunneling,
+	tunneling
+};
+
+//returns an array that contains the indices of the 8 neighbors of a given cell
 std::array<int, 8> get_neighbors(int x, int y);
+
+//converts the 2D representation of a location into a linear array index
+inline int index2d(int x, int y)
+{
+	return (FWIDTH * y) + x
+}
+
+//converts a linear array index into either the x or y of its 2D representation
+inline int linearX(int index)
+{
+	return (index % FWIDTH)
+}
+
+inline int linearY(int index)
+{
+	return (index / FWIDTH)
+}
 
 class Floor
 {
@@ -77,10 +101,10 @@ private:
 	void place_room(struct room *r);
 	bool check_intersection(struct room *r);
 	void gen_rooms();
-	void draw_path(int len, int* path);
-	void add_corridors();
 
-	void load_from_file();
+	std::vector<int> dijkstra_corridor(int source, int target);
+	void draw_path(std::vector<int> path);
+	void add_corridors();
 	void load_from_file(std::string filename);
 
 public:
@@ -100,14 +124,15 @@ public:
 	int get_dist_tunnel(int x, int y);
 	Character *get_character(int x, int y);
 
-	struct duo rand_room_location();
+	duo rand_room_location();
 	void print_floor();
 
 	void save_to_file();
 	void save_to_file(std::string filename);
+
+	void update_dist(isTunneling t);
+	 
 };
-
-
 
 #endif
 
