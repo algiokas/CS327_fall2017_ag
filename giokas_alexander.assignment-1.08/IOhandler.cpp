@@ -1,4 +1,4 @@
-#include "io.h"
+#include "IOhandler.h"
 #include "Floor.h"
 #include "PC.h"
 #include "NPC.h"
@@ -15,6 +15,7 @@ IO_handler::IO_handler(Floor *floor)
 {
 	this->f = floor;
 	quit = false;
+	this->turn_number = 1;
 
 	initscr();
 	raw();
@@ -39,25 +40,67 @@ IO_handler::~IO_handler()
 
 void IO_handler::handle_input()
 {
-	bool end = false;
+	bool fail;
 	int key;
 
 	do {
 		switch (key = getch()) {
-		case '1':
-			end = false;
+		case '7':
+		case 'y':
+		case KEY_HOME:
+			fail = !f->move_pc(northwest);
 			break;
-
+		case '8':
+		case 'k':
+		case KEY_UP:
+			fail = !f->move_pc(north);
+			break;
+		case '9':
+		case 'u':
+		case KEY_PPAGE:
+			fail = !f->move_pc(northeast);
+			break;
+		case '6':
+		case 'l':
+		case KEY_RIGHT:
+			fail = !f->move_pc(east);
+			break;
+		case '3':
+		case 'n':
+		case KEY_NPAGE:
+			fail = !f->move_pc(southeast);
+			break;
+		case '2':
+		case 'j':
+		case KEY_DOWN:
+			fail = !f->move_pc(south);
+			break;
+		case '1':
+		case 'b':
+		case KEY_END:
+			fail = !f->move_pc(southwest);
+			break;
+		case '4':
+		case 'h':
+		case KEY_LEFT:
+			fail = !f->move_pc(west);
+			break;
+		case '5':
+		case ' ':
+		case '.':
+		case KEY_B2:
+			//end = true;
+			break;
 		case 'q':
 			quit = true;
-			end = true;
+			fail = false;
 			break;
 
 		default:
-			end = true;
+			fail = true;
 			break;
 		}
-	} while (!end);
+	} while (fail);
 }
 
 void IO_handler::display_dungeon()
@@ -67,8 +110,12 @@ void IO_handler::display_dungeon()
 	clear();
 	for (y = 0; y < f->get_height(); y++) {
 		for (x = 0; x < f->get_width(); x++) {
+			
 			if (f->get_character(x, y)) {
 				mvaddch(y + 1, x, f->get_character(x, y)->symbol());
+			}
+			else if (!f->pc_can_see(x, y)) {
+				mvaddch(y + 1, x, ' ');
 			}
 			else {
 				switch (f->get_type(x, y)) {
@@ -100,9 +147,15 @@ void IO_handler::display_dungeon()
 		}
 	}
 	std::stringstream ss;
-	ss << "PC position is ( " << f->get_pc_location().x << ", " << f->get_pc_location().y << ").";
+	ss << "PC position : (" << f->get_pc_location().x << ", " << f->get_pc_location().y << ") Turn : " << turn_number;
 	std::string position = ss.str();
 	mvprintw(23, 1, position.c_str());
+	turn_number++;
+}
+
+void IO_handler::print_dungeon()
+{
+	f->print_floor();
 }
 
 bool IO_handler::quit_status()

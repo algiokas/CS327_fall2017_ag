@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <climits>
+#include <cmath>
 #include <arpa/inet.h>
 
 #include "PQueue.h"
@@ -13,34 +14,9 @@
 #include "PQueue.h"
 #include "PC.h"
 
-
 //array indices correspond to direction enum values, so if n = get_neighbors(x, y);
 //then n[north] is the index of the dungeon cell in the northern direction
-std::array<int, 8> get_neighbors(int x, int y)
-{
-	int index = index2d(x, y);
-	int left = index - 1;
-	int top = index - FWIDTH;
-	int right = index + 1;
-	int bottom = index + FHEIGHT;
-	int topleft = top - 1;
-	int topright = top + 1;
-	int botright = bottom + 1;
-	int botleft = bottom - 1;
 
-	std::array<int, 8> n;
-
-	n[0] = top;
-	n[1] = topright;
-	n[2] = right;
-	n[3] = botright;
-	n[4] = bottom;
-	n[5] = botleft;
-	n[6] = left;
-	n[7] = topleft;
-
-	return n;
-}
 
 Floor::Floor()
 {
@@ -131,6 +107,64 @@ void Floor::place_character(int x, int y, Character * c)
 		std::cout << "Cell index out of bounds";
 	}
 	char_map[index2d(x, y)] = c;
+}
+
+std::array<int, 8> Floor::get_neighbors(int x, int y)
+{
+	int index = index2d(x, y);
+	int top = index - FWIDTH;
+	int right = index + 1;
+	int bottom = index + FWIDTH;
+	int left = index - 1;
+
+	int topright = top + 1;
+	int botright = bottom + 1;
+	int botleft = bottom - 1;
+	int topleft = top - 1;
+
+	std::array<int, 8> n;
+
+	n[0] = top;
+	n[1] = topright;
+	n[2] = right;
+	n[3] = botright;
+	n[4] = bottom;
+	n[5] = botleft;
+	n[6] = left;
+	n[7] = topleft;
+
+	return n;
+}
+
+std::vector<int> Floor::bresenham_line(int start_x, int start_y, int end_x, int end_y)
+{
+	std::vector<int> line;
+
+
+	int dx = abs(end_x - start_x);
+	int dy = abs(end_y - start_y);
+	int diff = 2 * dy - dx;
+	int y = start_y;
+
+	int x_inc = (start_x < end_x) ? 1 : -1;
+	int y_inc = (start_y < end_y) ? 1 : -1;
+
+	if (start_x == end_x) {
+		for (int i = 0; i < dy; i++) {
+			line.push_back(index2d(start_x, start_y + (y_inc * i)));
+		}
+	}
+
+	for (int x = start_x; x <= end_x; x++) {
+		std::cout << "Adding (" << x << ", " << y << ") to line" << std::endl;
+		line.push_back(index2d(x, y));
+		if (diff > 0) {
+			y++;
+			diff -= 2 * dx;
+		}
+		diff += 2 * dy;
+	}
+	return line;
 }
 
 CType Floor::get_type(int x, int y)
@@ -447,7 +481,6 @@ void Floor::add_corridors()
 	int r, next;
 
 	for (r = 0; r < num_rooms; r++) {
-		int roomACentroid, roomBCentroid;
 		if (r == num_rooms - 1) {
 			next = 0;
 		} else {
@@ -458,10 +491,10 @@ void Floor::add_corridors()
 		int bx = rooms[next].loc.x + (rooms[next].dims.x / 2);
 		int by = rooms[next].loc.y + (rooms[next].dims.y / 2);
 
-		roomACentroid = index2d(ax, ay);
-		roomBCentroid = index2d(bx, by);
+		//int roomACentroid = index2d(ax, ay);
+		//int roomBCentroid = index2d(bx, by);
 
-		std::vector<int> path = dijkstra_corridor(roomACentroid, roomBCentroid);
+		std::vector<int> path = bresenham_line(ax, ay, bx, by);//dijkstra_corridor(roomACentroid, roomBCentroid);
 		draw_path(path);
 	}
 }
@@ -584,21 +617,40 @@ void Floor::load_from_file(std::string filename)
 void Floor::spawn_pc(PC* player)
 {
 	std::cout << "Spawning player character at (" << player->x() << ", " << player->y() << ")..." << std::endl;
+	std::array<int, 8> n = get_neighbors(player->x(), player->x());
+	for (int i : n) {
+		std::cout << "n: (" << linearX(i) << ", " << linearY(i) << ")" << std::endl;
+	}
 	this->pc = player;
 	pc_loc = index2d(player->x(), player->y());
 	char_map[pc_loc] = player;
-
+	pc->update_vision();
 }
 
-void Floor::move_pc(direction d)
+bool Floor::move_pc(direction d)
 {
 	std::array<int, 8> n = get_neighbors(linearX(pc_loc), linearY(pc_loc));
 	CType next = type_map.at(n[d]);
 	if (next != rock_c && next != immutable_c) {
+		std::cout << "moved" << std::endl;
 		char_map[n[d]] = pc;
 		char_map[pc_loc] = NULL;
 		pc_loc = n[d];
+		pc->move_to(linearX(n[d]), linearY(n[d]));
+		pc->update_vision();
+		return true;
 	}
+	return false;
+}
+
+bool Floor::pc_can_see(int x, int y)
+{
+	return pc->can_see(x, y);
+}
+
+bool Floor::pc_has_seen(int x, int y)
+{
+	return pc->has_seen(x, y);
 }
 
 void Floor::save_to_file()

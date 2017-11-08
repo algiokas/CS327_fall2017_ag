@@ -16,11 +16,13 @@ public:
 
 	void handle_input();
 	void display_dungeon();
+	void print_dungeon();
 	bool quit_status();
 	
 private:
 	Floor *f;
 	bool quit;
+	int turn_number;
 	//std::queue<std::string> message_queue;
 
 	//void display_message_queue(int x, int y);

@@ -3,6 +3,7 @@
 #define PC_H
 
 #include "Character.h"
+#include "Floor.h"
 
 const int pc_speed = 10;
 const int pc_vision_range = 3;
@@ -14,11 +15,14 @@ public:
 	PC(int x, int y);
 	~PC();
 	
-	//duo next_position();
+	void move_to(int x, int y);
+	void update_vision();
+	bool can_see(int x, int y);
+	bool has_seen(int x, int y);
 
 private:
-	//bool current_vision[FWIDTH * FHEIGHT];
-	//bool known_terrain[FWIDTH * FHEIGHT];
+	bool current_vision[FWIDTH * FHEIGHT];
+	bool known_terrain[FWIDTH * FHEIGHT];
 	int vision_range;
 };
 

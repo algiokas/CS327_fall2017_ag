@@ -11,10 +11,21 @@
 #include "Character.h"
 #include "PC.h"
 #include "io.h"
+#include "Definitions.h"
 
 
 int main(int argc, char *argv[])
 {
+	bool is_hw_107 = true;
+	if (is_hw_107) {
+		std::vector<Monster_definition> defs = parse_all_monsters();
+		for (Monster_definition m : defs) {
+			m.print_def();
+			std::cout << std::endl;
+		}
+		return 0;
+	}
+
 	srand(time(0));
 
 	int save = 0;

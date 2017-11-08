@@ -62,7 +62,6 @@ enum direction {
 };
 
 //returns an array that contains the indices of the 8 neighbors of a given cell
-std::array<int, 8> get_neighbors(int x, int y);
 
 //converts the 2D representation of a location into a linear array index
 inline int index2d(int x, int y) { return (FWIDTH * y) + x; }
@@ -98,6 +97,9 @@ public:
 	void set_cell_dist_tunnel(int x, int y, int dist);
 	void place_character(int x, int y, Character *c);
 
+	static std::array<int, 8> get_neighbors(int x, int y);
+	static std::vector<int> bresenham_line(int start_x, int start_y, int end_x, int end_y);
+
 	CType get_type(int x, int y);
 	int get_hardn(int x, int y);
 	int get_dist(int x, int y);
@@ -115,8 +117,11 @@ public:
 	void save_to_file(std::string filename);
 
 	void update_dist(isTunneling t);
+
 	void spawn_pc(PC* player);
-	void move_pc(direction d);
+	bool move_pc(direction d);
+	bool pc_can_see(int x, int y);
+	bool pc_has_seen(int x, int y);
 
 private:
 	int width;

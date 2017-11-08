@@ -8,7 +8,7 @@ CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -std=c++11 -Wno-deprecated
 LDFLAGS = -lncurses
 
 BIN = ag327
-OBJS = ag327.o Character.o Floor.o PC.o PQueue.o io.o
+OBJS = ag327.o Character.o Floor.o PC.o PQueue.o io.o Definitions.o Dice.o
 
 $(BIN): $(OBJS)
 	@$(ECHO) Linking $@

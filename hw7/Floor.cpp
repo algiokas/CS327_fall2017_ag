@@ -13,7 +13,6 @@
 #include "PQueue.h"
 #include "PC.h"
 
-
 //array indices correspond to direction enum values, so if n = get_neighbors(x, y);
 //then n[north] is the index of the dungeon cell in the northern direction
 std::array<int, 8> get_neighbors(int x, int y)

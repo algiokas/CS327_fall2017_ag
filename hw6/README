@@ -1,3 +1,16 @@
 Alex Giokas
 Com S 327 
-Main Project Readme
+HW6 Readme
+
+- I attempted to rewrite as much of my project as possible entirely in C++
+
+- A lot of changes were made in the name of using C++ style and idioms rather than those of C
+
+- Almost all cases of static arrays use the std::array<> container, and almost all cases of dynamic arrays
+  use the std::vector<> container
+  
+- I completely ran out of time, so my code is not only incomplete as per the spec
+  but has a ton of memory leaks that I was unable to diagnose since I actually never use "new" at all
+
+- The code will run and will display the ncurses based dungeon map, no input is detected other than
+  'q' to quit

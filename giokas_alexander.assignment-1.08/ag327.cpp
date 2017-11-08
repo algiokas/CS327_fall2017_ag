@@ -3,14 +3,15 @@
 #include <cstdlib>
 #include <ctime>
 #include <sstream>
-#include <string.h>
+#include <cstring>
 #include <ncurses.h>
 
 #include "PQueue.h"
 #include "Floor.h"
 #include "Character.h"
 #include "PC.h"
-#include "io.h"
+#include "IOhandler.h"
+#include "Definitions.h"
 
 
 int main(int argc, char *argv[])
