@@ -19,6 +19,7 @@ public:
 	void update_vision();
 	bool can_see(int x, int y);
 	bool has_seen(int x, int y);
+    void reset_vision();
 
 private:
 	std::array<bool, FWIDTH * FHEIGHT> current_vision;

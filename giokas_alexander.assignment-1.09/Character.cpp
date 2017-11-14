@@ -12,6 +12,10 @@ Character::Character(char sym, int x, int y, int spd, int sqnum)
 	this->seq_num = sqnum;
 }
 
+Character::~Character()
+{
+}
+
 char Character::symbol()
 {
 	return sym;
@@ -46,4 +50,10 @@ int Character::sequence_num()
 void Character::kill()
 {
 	alive = false;
+}
+
+void Character::set_location(int x, int y)
+{
+    this->x_pos = x;
+    this->y_pos = y;
 }

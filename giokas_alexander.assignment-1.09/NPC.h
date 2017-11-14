@@ -16,12 +16,17 @@ class NPC :
 	public Character
 {
 public:
+    NPC();
 	NPC(std::string name, char symbol, std::string description, int color,
 		int speed, unsigned long abilities, int hitpoints, Dice damage) :
 		Character(symbol, speed), 
 		name(name), 
 		description(description),
-		ability(abilities), hitpoints(hitpoints), damage(damage) {}
+        color(color),
+		ability(abilities), 
+        hitpoints(hitpoints), 
+        damage(damage) 
+        {}
 	~NPC();
 
 	inline std::string get_name() { return this->name; }

@@ -9,7 +9,22 @@
 class Object
 {
 public:
-	Object();
+	Object(std::string name, std::string desc, type_index type,
+           bool is_equip, int color, int hit, Dice dmg, int dodge,
+           int def, int weight, int spd, int attr, int val) :
+           name(name),
+           description(desc),
+           type(type),
+           is_equipment(is_equip),
+           color(color),
+           hit(hit),
+           damage(dmg),
+           dodge(dodge),
+           defense(def),
+           weight(weight),
+           speed(spd),
+           attribute(attr),
+           value(val) {}
 	~Object();
 
 	int roll_damage();

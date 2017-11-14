@@ -2,6 +2,8 @@
 #include "Dungeon.h"
 #include "PC.h"
 #include "NPC.h"
+#include "Definitions.h"
+#include "Object.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -115,38 +117,30 @@ void IO_handler::display_dungeon()
 	bool visible;
 	duo pc_loc = d->get_pc_location();
 	Character *c;
-	//Object *o;
+	Object *o;
 
 	clear();
 	for (y = 0; y < d->get_height(); y++) {
 		for (x = 0; x < d->get_width(); x++) {
-			/*
-			if (!d->pc_has_seen(x, y) && !d->pc_can_see(x, y)) {
-				mvaddch(y + 1, x, ' ');
-				break;
-			
-			*/
 			if ((visible = d->pc_can_see(x, y))) {
 				attron(A_BOLD);
 			}
-			if (pc_loc.x == x && pc_loc.y == y) {
-				mvaddch(y + 1, x, '@');
-			}
-			/*
-			else if (!d->pc_has_seen(x, y)) {
+            if (!d->pc_has_seen(x, y)) {
 				mvaddch(y + 1, x, ' ');
 			}
-			*/
+			else if (pc_loc.x == x && pc_loc.y == y) {
+				mvaddch(y + 1, x, '@');
+			}
 			else if ((c = d->get_character(x, y))) {
 				activate_color(((NPC *)c)->get_color());
 				mvaddch(y + 1, x, c->symbol());
 				deactivate_color(((NPC *)c)->get_color());
 			}
-			/*
 			else if ((o = d->get_object(x, y))) {
-				mvaddch(y + 1, x, d->get_character(x, y)->symbol());
+                activate_color(o->color);
+				mvaddch(y + 1, x, object_symbol[o->type]);
+                deactivate_color(o->color);
 			}
-			*/
 			else {
 				switch (d->get_type(x, y)) {
 				case rock_c:
@@ -180,7 +174,8 @@ void IO_handler::display_dungeon()
 		}
 	}
 	std::stringstream ss;
-	ss << "PC position : (" << d->get_pc_location().x << ", " << d->get_pc_location().y << ") Turn : " << turn_number;
+	ss << "PC position : (" << d->get_pc_location().x 
+       << ", " << d->get_pc_location().y << ") Turn : " << turn_number;
 	std::string position = ss.str();
 	mvprintw(23, 1, position.c_str());
 	turn_number++;

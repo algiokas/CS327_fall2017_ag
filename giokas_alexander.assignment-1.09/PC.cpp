@@ -14,6 +14,8 @@ PC::PC()
 	alive = true;
 	seq_num = 0;
 	vision_range = pow(pc_vision_range, 2);
+    current_vision.fill(false);
+    known_terrain.fill(false);
 }
 
 PC::PC(int x, int y)
@@ -25,6 +27,8 @@ PC::PC(int x, int y)
 	alive = true;
 	seq_num = 0;
 	vision_range = pow(pc_vision_range, 2);
+    current_vision.fill(false);
+    known_terrain.fill(false);
 }
 
 PC::~PC()
@@ -78,3 +82,8 @@ void PC::update_vision()
 }
 
 
+void PC::reset_vision()
+{
+    current_vision.fill(false);
+    known_terrain.fill(false);
+}

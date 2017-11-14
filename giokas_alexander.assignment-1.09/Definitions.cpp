@@ -59,6 +59,7 @@ std::vector<std::string> split(const std::string &s, char delim)
 
 std::vector<Monster_definition> parse_all_monsters()
 {
+    std::cout << "Parsing monster definitions..." << std::endl;
 	std::string fpath = std::string(std::getenv("HOME"));
 	if (fpath.empty()) {
 		fpath = ".";
@@ -265,10 +266,12 @@ std::vector<Monster_definition> parse_all_monsters()
 
 		if (current_tokens.at(0).compare("END") == 0) {
 			if (current_tokens.size() == 1 && parameters.all()) {
+                std::cout << "Adding new monster def to list" << std::endl;
 				defs.push_back(temp);
 			}
 			is_entry = false;
 			parameters.reset();
+            temp.reset_color();
 			continue;
 		}
 
@@ -310,7 +313,6 @@ std::vector<Object_definition> parse_all_objects()
 
 		if (is_header) {
 			if (current_line.compare(OBJECT_FILE_TOKEN) != 0) {
-				std::cout << current_line << std::endl;
 				std::cout << "Invalid file metadata, Terminating" << std::endl;
 				return defs;
 			}
@@ -556,6 +558,7 @@ std::vector<Object_definition> parse_all_objects()
 
 		if (current_tokens.at(0).compare("END") == 0) {
 			if (current_tokens.size() == 1 && parameters.all()) {
+                std::cout << "Parsed new Object definition..." << std::endl;
 				defs.push_back(temp);
 			}
 			is_entry = false;
@@ -680,4 +683,30 @@ void Object_definition::print_def()
 	std::cout << this->speed.d_string() << std::endl;
 	std::cout << this->attr.d_string() << std::endl;
 	std::cout << this->val.d_string() << std::endl;
+}
+
+Object * Object_definition::generate_object()
+{
+    Object * obj = new Object(
+        this->name,
+        this->description,
+        this->type,
+        this->is_equipment,
+        this->color,
+        this->hit.roll(),
+        this->dam,
+        this->dodge.roll(),
+        this->def.roll(),
+        this->weight.roll(),
+        this->speed.roll(),
+        this->attr.roll(),
+        this->val.roll()
+    );
+
+    return obj;
+}
+
+void Monster_definition::reset_color()
+{
+    this->color.clear();
 }

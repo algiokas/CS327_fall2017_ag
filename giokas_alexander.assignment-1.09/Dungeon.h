@@ -30,6 +30,7 @@ public:
 	int get_dist(int x, int y);
 	int get_dist_tunnel(int x, int y);
 	Character *get_character(int x, int y);
+    Object *get_object(int x, int y);
 	duo get_pc_location();
 
 	int get_width();
@@ -52,6 +53,7 @@ private:
 	std::vector<Object_definition> object_defs;
 
 	void generate_monsters();
+    void generate_objects();
 
 
 

@@ -7,7 +7,7 @@ class Character
 public:
 	Character() {}
 	Character(char sym, int x, int y, int spd, int sqnum);
-	virtual ~Character() {}
+	virtual ~Character();
 
 	char symbol();
 	int x();
@@ -16,6 +16,8 @@ public:
 	bool is_alive();
 	int sequence_num();
 	void kill();
+
+    void set_location(int x, int y);
 
 protected:
 	Character(char symbol, int speed) :

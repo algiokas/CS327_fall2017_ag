@@ -11,13 +11,15 @@ Dungeon::Dungeon()
 	Floor *f = new Floor();
 	this->floors.push_back(f);
 	this->active_floor = 0;
-	generate_monsters();
 	duo spawn_point = rand_room_location();
 	pc = PC(spawn_point.x, spawn_point.y);
 	spawn_pc();
 
 	monster_defs = parse_all_monsters();
 	object_defs = parse_all_objects();
+
+    generate_monsters();
+    generate_objects();
 }
 
 Dungeon::Dungeon(std::string filename)
@@ -26,13 +28,15 @@ Dungeon::Dungeon(std::string filename)
 	Floor *f = new Floor(filename);
 	this->floors.push_back(f);
 	this->active_floor = 0;
-	generate_monsters();
 	duo spawn_point = rand_room_location();
 	pc = PC(spawn_point.x, spawn_point.y);
 	spawn_pc();
 
 	monster_defs = parse_all_monsters();
 	object_defs = parse_all_objects();
+
+    generate_monsters();
+    generate_objects();
 }
 
 
@@ -61,6 +65,8 @@ bool Dungeon::change_floor_down()
 		f->place_at_stairs(true);
 		this->floors.push_back(f);
 	}
+    this->pc.reset_vision();
+    this->pc.update_vision();
 	this->active_floor++;
 	generate_monsters();
 	return true;
@@ -146,13 +152,17 @@ bool Dungeon::pc_has_seen(int x, int y)
 void Dungeon::generate_monsters()
 {
 	int num_defs = monster_defs.size();
+    std::cout << "Generating 10 monsters from " << num_defs << " descriptions" << std::endl;
+    if (num_defs < 1) {
+        return;
+    }
 	int mon;
 	duo loc;
 	for (int i = 0; i < 10; i++) {
 		mon = rand() % num_defs;
 		loc = this->floors.at(active_floor)->rand_room_location();
 
-		while (monster_defs.at(mon).has_ability(UNIQ) || monster_defs.at(mon).num_generated() > 0) {
+		while (monster_defs.at(mon).has_ability(UNIQ) && monster_defs.at(mon).num_generated() > 0) {
 			mon = rand() % num_defs;
 		}
 		while (this->floors.at(active_floor)->get_character(loc.x, loc.y)) {
@@ -161,4 +171,30 @@ void Dungeon::generate_monsters()
 		this->floors.at(active_floor)->place_character(loc.x, loc.y,
 			((Character *) monster_defs.at(mon).generate_NPC()));
 	}
+}
+
+
+void Dungeon::generate_objects()
+{
+	int num_defs = object_defs.size();
+    std::cout << "Generating 10 objects from " << num_defs << " descriptions" << std::endl;
+    if (num_defs < 1) {
+        return;
+    }
+	int obj;
+	duo loc;
+	for (int i = 0; i < 10; i++) {
+		obj = rand() % num_defs;
+		loc = this->floors.at(active_floor)->rand_room_location();
+		while (this->floors.at(active_floor)->get_object(loc.x, loc.y)) {
+			loc = this->floors.at(active_floor)->rand_room_location();
+		}
+		this->floors.at(active_floor)->place_object(loc.x, loc.y,
+			(object_defs.at(obj).generate_object()));
+	}
+}
+
+Object * Dungeon::get_object(int x, int y)
+{
+    return this->floors.at(active_floor)->get_object(x, y);
 }

@@ -35,6 +35,8 @@ extern std::vector<std::string> colors;
 
 extern std::vector<std::string> item_types;
 
+extern const char object_symbol[];
+
 const std::string MONSTER_ENTRY_TOKEN = "BEGIN MONSTER";
 const std::string MONSTER_FILE_TOKEN = "RLG327 MONSTER DESCRIPTION 1";
 const std::string MONSTERS_FNAME = "monster_desc.txt";
@@ -44,7 +46,7 @@ const std::string OBJECT_FILE_TOKEN = "RLG327 OBJECT DESCRIPTION 1";
 const std::string OBJECTS_FNAME = "object_desc.txt";
 
 class NPC;
-//class Object;
+class Object;
 
 class Monster_definition {
 public:
@@ -61,6 +63,7 @@ public:
 	inline void set_damage(Dice damage) { this->damage = damage; }
 
 	bool add_color(std::string color);
+    void reset_color();
 	bool give_ability(std::string ability);
 
 	bool has_ability(abilities_index a);
@@ -107,7 +110,7 @@ public:
 
 	void print_def();
 
-	//Object *generate_object();
+	Object *generate_object();
 
 
 private:

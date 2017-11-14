@@ -5,7 +5,7 @@ RM = rm -f
 
 CFLAGS = -Wall -Werror -ggdb -funroll-loops
 CXXFLAGS = -Wall -Werror -ggdb -funroll-loops
-LDFLAGS = -lncurses
+LDFLAGS = -lncurses 
 
 BIN = rlg327
 OBJS = rlg327.o heap.o dungeon.o path.o utils.o character.o event.o \
