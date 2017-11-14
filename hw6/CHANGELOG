@@ -1,0 +1,233 @@
+Alex Giokas
+Com S 327
+Primary Changelog
+
+9/3/2017 -----------------------------
+- Created dungeon.h, dungeon.c files
+
+- Created Floor, Room, Duo structs
+
+- Created basic function prototypes for generate_floor(), add_rooms(), add_corridors()
+  and print_floor()
+
+- Added define macros FWIDTH and FHEIGHT to dungeon.c
+
+- Added comments for all current structs and functions
+
+9/4/2017 -----------------------------
+- Added Cell struct and CellType enum
+
+- Implemented generate_floor() function to set a floor pointer to basic values and allocate space
+  for pointer members
+
+- Started to Implement add_rooms() function by creating variables for total size of a floor
+  and the amount of free space available on a floor,
+
+- Added main loop to add_rooms() which randomly generates locations and sizes for rooms
+
+- defined MINROOMS, MAXROOMS, and ROOMDENSITY to control the number and total size of rooms on floor
+
+- Created check_intersection() and place_room() prototypes in dungeon.c
+
+9/5/2017 -----------------------------
+- Implemented place_room() to encapsulate the process of modifying a rectangular region of
+  a floor's map to contain room tiles
+
+- Implemented check_intersection() to encapsulate the process of checking whether a new room
+  would "fit" on the floor without intersecting any other rooms
+
+- Modified add_rooms() so that, after randomly generating a location and size for a room, it
+  checks if that room intersects any other rooms, then adds it to the room array of the floor
+  and places the room on the floor's map. If the random values generated for a new room result
+  in an invalid room, those values are simply discarded.
+
+- Created empty main method that returns 0, then added srand(time(NULL)); to seed the RNG
+
+- Modified the comment structure of all function declarations and implementations in dungeon.c
+  and dungeon.h to be consistent
+
+9/6/2017 -----------------------------
+- Implemented print_floor() to print the map of a floor to console
+
+- Modified the map member of struct Floor to be a single pointer rather than a double pointer,
+  also changed the corresponding malloc in generate_floor()
+
+- Declared and implemented complementary edit_cell() and get_cell() methods which encapsulate
+  the pointer arithmetic required to treat a 1D map array as 2D.
+
+- changed all existing calls to "floor->map[x][y]" to the appropriate edit_cell() or get_cell() calls  
+- Removed "typedef" from all structs in dungeon.h and edited all declaration of struct variables
+  to have the "struct" keyword
+
+- Changed generate_floor() to init_floor(), init_floor now only handles initial values
+  and allocating space for floor members. add_rooms() and add_corridors() now run in main
+
+- Defined and implemented a delete_floor() function that takes a floor pointer and frees the
+  memory allocated for that pointer and its fields
+
+- First test of program, add_corridors not yet implemented, program prints the frame but
+  map output is blank
+
+- created debug_floor function to output all the members of a floor other than its map (which 
+  is printed by print_floor())
+
+- modified print_floor() to print the correct characters for each type of cell
+
+- fixed errors in edit_cell() where the hardness value of the edited cell was being set to
+  a CellType rather than the hardness
+
+- fixed similar error in get_cell() where the output cell pointer hardness was being set to a 
+  CellType
+
+- output is now fully functional, but room generation behavior is undesired
+
+- fixed an error in add_rooms() where the maximum size of a room was causing rooms to go off
+  the edge of the map.
+
+- fixed an error in check_collision() where rooms could be detected as not colliding if one room
+  started, and ended outside another room
+
+- Dungeon initialization and room generation are fully functional
+
+- Deleted function comments from dungeon.h, function comments remain in dungeon.c
+
+- Added basic corridor generation. Uses straight line horizontal and verticacl paths from 
+  the centroid of each room to the next, randomly moving in either the x or the y direction first.
+
+- Currently the dungeon is not guarranteed to be connected, somtimes the generation
+  leaves a room disconnected
+
+9/10/2017
+---------------------
+- Created heap.h and heap.c (later renamed pqueue.h and pqueue.c).
+
+- Laid out basic heap structure in pqueue.h. Node struct, containing a priority and a void pointer
+  and heap struct with a dynamic array of nodes, an element size, capacity and size member.
+
+- Created prototypes for basic functions: init_heap(), delete_heap(), insert(), remove_min()
+
+- Implemented init_heap() and delete_heap() in heap.c
+
+- Started to implement insert()
+
+9/11/2017
+---------------------
+- finished implementing insert()
+
+- renamed files, structs and functions from some variation of "heap" to some variation of "pqueue"
+  since the heap implementation specifically relies on a priority value
+
+- started to implement remove_min()
+
+- created local functions percolate_up() and percolate_down() to handle maintaining the structure
+  of the heap
+
+- created local function min_prio() to compare the priority of two indices
+
+- completed implementing remove_min()
+
+- Priority queue for dijkstra's algorithm is now fully implemented and working
+
+- in Dungeon.c, changed draw_path() function so that it only draws a path based on an array
+  of map indices, rather than having the path calculation in this function.
+
+- Created dijkstra_path() function
+
+9/12/2017
+---------------------
+- In dungeon.h, removed Cell struct, removed the "map" member from the floor struct and replaced
+  it with type_map and hardness_map for performance reasons.
+
+- Added typedef alias "CType" to CellType enum
+
+- Modified all functions in dungeon.h that took Cell structs, or Cell struct pointers to instead
+  either take an int pointer, or return an int or CType
+
+- in dungeon.c, split get_cell() into get_type() and get_hardness() functions which, instead of
+  returning a cell struct, return the respective values for that cell
+
+- replaced all uses of enum CellType with CType alias
+
+- Any use of the Cell struct was removed and replaced with seperate values where needed
+
+9/13/2017
+---------------------
+- Completed implementation of dijkstra_path() function and draw_path() functions. Corridors in
+  the dungeon are no longer straight line based and can meander a bit around the dungeon
+
+- Added an int debug_output as a global variable. All debug messages (for example those at the
+  beginning of functions) will only be printed if this variable is 1. For now it is simply set
+  by me personally, however I plan to make it controllable with some sort of command line switch
+  like a --debug argument which is the main reason I made it a global variable rather than a macro
+
+- Added basic command line argument parsing for --save and --load switches.
+
+9/14/2017
+--------------------
+- Implemented do_save() function to write a dungeon to file
+
+- Implemented write_bigendian() as a local wrapper function for fprints() which writes a stream
+  of 4 byte data (such as 32 bit integers) in big-endian form
+
+- Implemented do_load() function to load dungeon from file
+
+- Fixed a memory management issue where I was just freeing the pointer to a priority queue rather
+  than using the delete function to free all of its othe allocated memory
+
+9/20/2017
+-------------------
+- Removed several unnecessary uses of malloc and replaced them with static instances, removed
+  corresponding calls to free
+
+- Modified my do_load() function to be able to load an arbitary number of rooms using realloc. 
+  Previously my code had issues dealing with specific instructor provided test files because 
+  they contained more rooms than would be ordinarily generated by the dungeon generator
+
+- modified makefile for flexibility and extensibility, added variables, a generalized call for
+  compiling source files into object files, a clean option run using "make clean" and several
+  new compiler flags (-Wall, -Werror, etc...)
+
+- fixed a couple of issues where variables were initialized inside of control structures and might
+  not actually be initialized at runtime
+
+- added parsing for a '--DEBUG' switch which turns on all debug text in my code
+
+- removed some unused variables
+
+10/3/2017
+-------------------
+- Created main.c file, moved main function from dungeon.c to main.c
+
+- moved all define macros from dungeon.c to dungeon.h
+
+- changed min and max functions to min_int and max_int and moved both function definitions to 
+  dungeon.h (note: functions are both inline)
+
+- added declarations for all functions in dungeon.c too dungeon.h, some functions might not be
+  needed outside the scope of dungeon.c but this is something I can deal with later. for now, all
+  dungeon.c functions are visible through dungeon.h
+
+- changed global variable debug_output to floor_debug and replaced all related calls, then created
+  associated function set_floor_debug to allow main.c  to set the value of floor_debug
+
+- in main.c, debug_output is now a local variable in main() that is then used as an argument for
+  set_floor_debug and to optionally call other debugging functions such as debug_floor() from main
+
+- no functionality added through these changes, however the structure of the program should
+  hopefully be more logical
+
+10/25/2017
+------------------
+- I fell pretty far behind on the changelog so this is a basic overview of the changes since the last
+  entry, hopefully I will go back and update this retroactively.
+  
+- Completely rewrote much of the code in C++
+
+- Everything pertaining to the dungeon map (floor.h, floor.c) has been entirely rewritten using
+  object-oriented design paradigms
+  
+- Currently dungeon generation is working as before, however monster generation is not yet implemented in C++
+
+- Display using ncurses words, as does basic input handling
+
+

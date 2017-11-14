@@ -4,25 +4,17 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <byteswap.h>
+#include <climits>
+#include <arpa/inet.h>
 
 #include "pqueue.h"
 #include "Floor.h"
 #include "Character.h"
+#include "PQueue.h"
 #include "PC.h"
 
-enum direction {
-	north,
-	northeast,
-	east,
-	southeast,
-	south,
-	southwest,
-	west,
-	northwest
-};
 
-//array indices correspond to enum values, so if n = get_neighbors(x, y);
+//array indices correspond to direction enum values, so if n = get_neighbors(x, y);
 //then n[north] is the index of the dungeon cell in the northern direction
 std::array<int, 8> get_neighbors(int x, int y)
 {
@@ -50,7 +42,7 @@ std::array<int, 8> get_neighbors(int x, int y)
 	return n;
 }
 
-Floor::Floor(PC* pc)
+Floor::Floor()
 {
 	width = FWIDTH;
 	height = FHEIGHT;
@@ -59,8 +51,6 @@ Floor::Floor(PC* pc)
 	num_monsters = 0;
 	max_monsters = 0;
 	time = 0;
-
-	this->pc = pc;
 
 	rooms = std::vector<struct room>();
 	type_map = std::array<CType, FWIDTH * FHEIGHT>();
@@ -72,21 +62,18 @@ Floor::Floor(PC* pc)
 	empty_floor();
 	gen_rooms();
 	add_corridors();
-	duo spawn = rand_room_location();
-	place_pc(spawn.x, spawn.y);
+	add_stairs();
 }
 
-Floor::Floor(PC* pc, std::string filename)
+Floor::Floor(std::string filename)
 {
 	width = FWIDTH;
 	height = FHEIGHT;
 	num_rooms = 0;
-	pc_loc = index2d(pc->x, pc->y);
+	pc_loc = 0;
 	num_monsters = 0;
 	max_monsters = 0;
 	time = 0;
-
-	this->pc = pc;
 
 	rooms = std::vector<struct room>();
 	type_map = std::array<CType, FWIDTH * FHEIGHT>();
@@ -96,8 +83,7 @@ Floor::Floor(PC* pc, std::string filename)
 	char_map = std::array<Character *, FWIDTH * FHEIGHT>();
 
 	load_from_file(filename);
-	duo spawn = rand_room_location();
-	place_pc(spawn.x, spawn.y);
+	add_stairs();
 }
 
 Floor::~Floor()
@@ -107,7 +93,7 @@ Floor::~Floor()
 void Floor::set_cell_type(int x, int y, CType input_type)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height) {
-		throw "Cell index out of bounds";
+		std::cout << "Cell index out of bounds";
 	}
 	type_map[index2d(x, y)] = input_type;
 }
@@ -115,10 +101,10 @@ void Floor::set_cell_type(int x, int y, CType input_type)
 void Floor::set_cell_hardn(int x, int y, int input_hardn)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height) {
-		throw "Cell index out of bounds";
+		std::cout << "Cell index out of bounds";
 	}
 	if (input_hardn < 0 || input_hardn > 255) {
-		throw "Invalid hardness value";
+		std::cout << "Invalid hardness value";
 	}
 	hard_map[index2d(x, y)] = input_hardn;
 }
@@ -126,7 +112,7 @@ void Floor::set_cell_hardn(int x, int y, int input_hardn)
 void Floor::set_cell_dist(int x, int y, int dist)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height) {
-		throw "Cell index out of bounds";
+		std::cout << "Cell index out of bounds";
 	}
 	dist_map[index2d(x, y)] = dist;
 }
@@ -134,7 +120,7 @@ void Floor::set_cell_dist(int x, int y, int dist)
 void Floor::set_cell_dist_tunnel(int x, int y, int dist)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height) {
-		throw "Cell index out of bounds";
+		std::cout << "Cell index out of bounds";
 	}
 	dist_map_tunnel[index2d(x, y)] = dist;
 }
@@ -142,7 +128,7 @@ void Floor::set_cell_dist_tunnel(int x, int y, int dist)
 void Floor::place_character(int x, int y, Character * c)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height) {
-		throw "Cell index out of bounds";
+		std::cout << "Cell index out of bounds";
 	}
 	char_map[index2d(x, y)] = c;
 }
@@ -150,7 +136,7 @@ void Floor::place_character(int x, int y, Character * c)
 CType Floor::get_type(int x, int y)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height) {
-		throw "Cell index out of bounds";
+		std::cout << "Cell index out of bounds";
 	}
 	return type_map[index2d(x, y)];
 }
@@ -158,7 +144,7 @@ CType Floor::get_type(int x, int y)
 int Floor::get_hardn(int x, int y)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height) {
-		throw "Cell index out of bounds";
+		std::cout << "Cell index out of bounds";
 	}
 	return hard_map[index2d(x, y)];
 }
@@ -178,8 +164,28 @@ Character * Floor::get_character(int x, int y)
 	return char_map[index2d(x, y)];;
 }
 
+duo Floor::get_pc_location()
+{
+	duo l = duo();
+	l.x = linearX(pc_loc);
+	l.y = linearY(pc_loc);
+
+	return l;
+}
+
+int Floor::get_width()
+{
+	return this->width;
+}
+
+int Floor::get_height()
+{
+	return this->height;
+}
+
 void Floor::empty_floor()
 {
+	std::cout << "Generating empty floor..." << std::endl;
 	int x, y;
 	for (y = 0; y < height; y++) {
 		for (x = 0; x < width; x++) {
@@ -188,8 +194,8 @@ void Floor::empty_floor()
 				set_cell_hardn(x, y, 255);
 			}
 			else {
-				int rand_hardness = 1 + (std::rand() % 254);
-				set_cell_type(x, y, immutable_c);
+				int rand_hardness = 1 + (rand() % 254);
+				set_cell_type(x, y, rock_c);
 				set_cell_hardn(x, y, rand_hardness);
 			}
 		}
@@ -198,6 +204,7 @@ void Floor::empty_floor()
 
 void Floor::place_room(room * r)
 {
+	std::cout << "placing room..." << std::endl;
 	int x, y;
 	for (y = r->loc.y; y < r->loc.y + r->dims.y; y++) {
 		for (x = r->loc.x; x < r->loc.x + r->dims.x; x++) {
@@ -209,7 +216,8 @@ void Floor::place_room(room * r)
 
 bool Floor::check_intersection(room * r)
 {
-	if (this->num_rooms == 0) {
+	std::cout << "checking intersection with " << num_rooms << " rooms..." << std::endl;
+	if (num_rooms == 0) {
 		return false;
 	}
 	int roomIter;
@@ -224,10 +232,10 @@ bool Floor::check_intersection(room * r)
 		int old_right = rooms[roomIter].loc.x + rooms[roomIter].dims.x;
 		int old_top = rooms[roomIter].loc.y;
 		int old_bottom = rooms[roomIter].loc.y + rooms[roomIter].dims.y;
-
-		bool x_intersect = 0;
-		bool y_intersect = 0;
-
+		
+		bool x_intersect = false;
+		bool y_intersect = false;
+		
 		if (old_left <= new_left && new_left <= old_right) { x_intersect = true; }
 		if (old_left <= new_right && new_right <= old_right) { x_intersect = true; }
 		if (new_left <= old_left && old_right <= new_right) { x_intersect = true; }
@@ -242,35 +250,37 @@ bool Floor::check_intersection(room * r)
 
 void Floor::gen_rooms()
 {
+	std::cout << "generating rooms..." << std::endl;
 	double floorsize = width * height;
 	double freespace = floorsize; //the total amount of free space within which to place rooms
 	int roomIter = 0;
-	struct room newRoom; //blank room that we can fill with data and pass to functions
+	room newRoom = room(); //blank room that we can fill with data and pass to functions
 
 	while ((num_rooms < MINROOMS || (freespace / floorsize) > 1 - ROOMDENSITY)
 		&& num_rooms < MAXROOMS) {
 		//Rooms should never touch the edge
-		newRoom.loc.x = 1 + (std::rand() % (width - MINROOMWIDTH - 1));
-		newRoom.loc.y = 1 + (std::rand() % (height - MINROOMHEIGHT - 1));
+		newRoom.loc.x = 1 + (rand() % (width - MINROOMWIDTH - 1));
+		newRoom.loc.y = 1 + (rand() % (height - MINROOMHEIGHT - 1));
 
 		int maxwidth = width - newRoom.loc.x - 1;
 		int maxheight = height - newRoom.loc.y - 1;
 		if (maxwidth > MINROOMWIDTH) {
-			newRoom.dims.x = MINROOMWIDTH + (std::rand() % (maxwidth - MINROOMWIDTH));
+			newRoom.dims.x = MINROOMWIDTH + (rand() % (maxwidth - MINROOMWIDTH));
 		}
 		else {
 			newRoom.dims.x = MINROOMWIDTH;
 		}
 
 		if (maxheight > MINROOMWIDTH) {
-			newRoom.dims.y = MINROOMHEIGHT + (std::rand() % (maxheight - MINROOMHEIGHT));
+			newRoom.dims.y = MINROOMHEIGHT + (rand() % (maxheight - MINROOMHEIGHT));
 		}
 		else {
 			newRoom.dims.y = MINROOMHEIGHT;
 		}
 
 		if (!check_intersection(&newRoom)) {
-			rooms[roomIter] = newRoom;
+			std::cout << "No Intersection" << std::endl;
+			rooms.push_back(newRoom);
 			num_rooms++;
 			place_room(&newRoom);
 			//get the total space taken up by the new room
@@ -283,12 +293,12 @@ void Floor::gen_rooms()
 
 duo Floor::rand_room_location()
 {
-	int r, x, y;
-	r = std::rand() % num_rooms;
+	std::cout << "Generating random room location..." << std::endl;
+	int r = rand() % num_rooms;
 
 	struct duo out;
-	out.x = rooms[r].loc.x + (std::rand() % rooms[r].loc.y);
-	out.y = rooms[r].loc.y + (std::rand() % rooms[r].loc.y);
+	out.x = rooms[r].loc.x + (rand() % rooms[r].dims.x);
+	out.y = rooms[r].loc.y + (rand() % rooms[r].dims.y);
 
 	return out;
 }
@@ -302,19 +312,18 @@ inline int pf_weight(int hardness) {
 
 std::vector<int> Floor::dijkstra_corridor(int source, int target)
 {
+	std::cout << "calculating new corridor..." << std::endl;
 	std::array<int, FWIDTH * FHEIGHT> dist;
 	std::array<int, FWIDTH * FHEIGHT> prev;
 	std::array<bool, FWIDTH * FHEIGHT> visited;
 	std::vector<int> path;
 	
-	struct PQueue pq;
+	PQueue pq = PQueue();
 
 	int current = -1;
 	int in;
 	int out;
 	int iter;
-
-	init_PQ(&pq, (width * height / 2), sizeof(int));
 
 	//dist: set values to "Infinity" (INT_MAX) for all nodes except source, which is set to 0
 	//visited: set values to 0 for all nodes except source, which is set to 1
@@ -331,11 +340,11 @@ std::vector<int> Floor::dijkstra_corridor(int source, int target)
 		prev[iter] = -1;
 	}
 	in = source;
-	insert(&pq, 0, &in);
+	pq.insert(0, in);
 
 	//primary search loop 
-	while (pq.size) { // queue is not empty
-		remove_min(&pq, &out);
+	while (!pq.is_empty()) { // queue is not empty
+		out = pq.remove_min();
 		current = out;
 		if (current == target) {
 			break;
@@ -349,7 +358,7 @@ std::vector<int> Floor::dijkstra_corridor(int source, int target)
 				prev[left] = current;
 				if (!visited[left]) {
 					in = left;
-					insert(&pq, dist[left], &in);
+					pq.insert(dist[left], in);
 					visited[left] = 1;
 				}
 			}
@@ -363,7 +372,7 @@ std::vector<int> Floor::dijkstra_corridor(int source, int target)
 				prev[top] = current;
 				if (!visited[top]) {
 					in = top;
-					insert(&pq, dist[top], &in);
+					pq.insert(dist[top], in);
 					visited[top] = 1;
 				}
 			}
@@ -377,7 +386,7 @@ std::vector<int> Floor::dijkstra_corridor(int source, int target)
 				prev[right] = current;
 				if (!visited[right]) {
 					in = right;
-					insert(&pq, dist[right], &in);
+					pq.insert(dist[right], in);
 					visited[right] = 1;
 				}
 			}
@@ -391,14 +400,14 @@ std::vector<int> Floor::dijkstra_corridor(int source, int target)
 				prev[bottom] = current;
 				if (!visited[bottom]) {
 					in = bottom;
-					insert(&pq, dist[bottom], &in);
+					pq.insert(dist[bottom], in);
 					visited[bottom] = 1;
 				}
 			}
 		}
 	}
 	if (current == -1) {
-		throw "dijkstra_corridor() error : queue failure";
+		std::cout << "dijkstra_corridor() error : queue failure";
 	}
 	
 	int pathIter = 1;
@@ -409,30 +418,32 @@ std::vector<int> Floor::dijkstra_corridor(int source, int target)
 		pathIter++;
 	}
 
-	delete_PQ(&pq);
-
 	return path;
 }
 
 void Floor::draw_path(std::vector<int> path)
 {
+	std::cout << "drawing path from " << path.at(0) << " to " << path.at(path.size() -1) << std::endl;
 	if (path.empty()) {
-		throw "invalid draw path";
+		std::cout << "invalid draw path";
 	}
-	int i;
+	uint32_t i; //prevents comparison to path.size() from giving a warning
 	//while(path[i]) {
 	for (i = 0; i < path.size(); i++) {
 		int pathx = (linearX(path[i]));
 		int pathy = (linearY(path[i]));
+		std::cout << get_type(pathx, pathy);
 		if (get_type(pathx, pathy) == rock_c) {
 			set_cell_type(pathx, pathy, corridor_c);
 			set_cell_hardn(pathx, pathy, 0);
 		}
 	}
+	std::cout << std::endl;
 }
 
 void Floor::add_corridors()
 {
+	std::cout << "adding corridors..." << std::endl;
 	int r, next;
 
 	for (r = 0; r < num_rooms; r++) {
@@ -455,9 +466,19 @@ void Floor::add_corridors()
 	}
 }
 
+void Floor::add_stairs()
+{
+	duo up = rand_room_location();
+	duo down = rand_room_location();
+
+	type_map[index2d(up.x, up.y)] = stairs_up_c;
+	hard_map[index2d(up.x, up.y)] = 0;
+	type_map[index2d(down.x, down.y)] = stairs_down_c;
+	hard_map[index2d(down.x, down.y)] = 0;
+}
+
 void Floor::load_from_file(std::string filename)
 {
-
 	std::string fpath;
 	std::ifstream f;
 	std::string marker = FMARKER;
@@ -492,8 +513,6 @@ void Floor::load_from_file(std::string filename)
 		else if (i == 6) {
 			marker_buff[6] = '\0';
 			std::string marker_str = reinterpret_cast<char*>(marker_buff);
-			if (!marker.compare(marker_str))
-				throw "Input file has invalid marker";
 		}
 
 		//handle version number
@@ -506,7 +525,7 @@ void Floor::load_from_file(std::string filename)
 				(uint32_t)version_buff[2] << 8 |
 				(uint32_t)version_buff[3];
 			if (v != version) {
-				throw "input file has invalid version";
+				std::cout << "input file has invalid version";
 			}
 		}
 
@@ -522,7 +541,7 @@ void Floor::load_from_file(std::string filename)
 				(uint32_t)size_buff[3];
 			//fsize = s;
 			if (s < 1694) {
-				throw "input file has invalid size";
+				std::cout << "input file has invalid size";
 			}
 		}
 
@@ -562,24 +581,38 @@ void Floor::load_from_file(std::string filename)
 	}
 }
 
-void Floor::place_pc(int x, int y)
+void Floor::spawn_pc(PC* player)
 {
-	pc_loc = index2d(x, y);
-	char_map[pc_loc] = pc;
+	std::cout << "Spawning player character at (" << player->x() << ", " << player->y() << ")..." << std::endl;
+	this->pc = player;
+	pc_loc = index2d(player->x(), player->y());
+	char_map[pc_loc] = player;
 
+}
+
+void Floor::move_pc(direction d)
+{
+	std::array<int, 8> n = get_neighbors(linearX(pc_loc), linearY(pc_loc));
+	CType next = type_map.at(n[d]);
+	if (next != rock_c && next != immutable_c) {
+		char_map[n[d]] = pc;
+		char_map[pc_loc] = NULL;
+		pc_loc = n[d];
+	}
 }
 
 void Floor::save_to_file()
 {
+
 	save_to_file(DEFAULT_FNAME);
 }
 
 void Floor::save_to_file(std::string filename)
 {
+	std::cout << "saving to file..." << std::endl;
 	std::string fpath;
 	std::ofstream f;
 	std::string marker = FMARKER;
-	int i, ch;
 	int32_t version = PVERSION;
 	int32_t fsize;
 
@@ -595,10 +628,13 @@ void Floor::save_to_file(std::string filename)
 
 	f.open(fpath, std::ios_base::out | std::ios_base::binary);
 
+	uint32_t version_be = htonl(version);
+	uint32_t fsize_be = htonl(fsize);
+
 	//begin file write
 	f.write(marker.c_str(), marker.length());
-	f.write(bswap_32(version), sizeof version);
-	f.write(bswap_32(fsize), sizeof fsize);
+	f.write(reinterpret_cast<const char *>(&version_be), sizeof version);
+	f.write(reinterpret_cast<const char *>(&fsize_be), sizeof fsize);
 
 	int i;
 	for (i = 0; i < width * height; i++) {
@@ -619,17 +655,16 @@ void Floor::save_to_file(std::string filename)
 
 void Floor::update_dist(isTunneling t)
 {
+	std::cout << "Updating distance map..." << std::endl;
 	std::array<int, FWIDTH * FHEIGHT> dist;
 	std::array<int, FWIDTH * FHEIGHT> prev;
 	std::array<bool, FWIDTH * FHEIGHT> visited;
-	struct PQueue pq;
+	PQueue pq = PQueue();
 	int current = -1;
 	int in;
 	int out;
 	int iter;
 	int sourceIndex = pc_loc;
-
-	init_PQ(&pq, (width * height / 2), sizeof(int));
 
 	//dist: set values to "Infinity" (INT_MAX) for all nodes except source, which is set to 0
 	//visited: set values to 0 for all nodes except source, which is set to 1
@@ -646,11 +681,11 @@ void Floor::update_dist(isTunneling t)
 		prev[iter] = -1;
 	}
 	in = sourceIndex;
-	insert(&pq, 0, &in);
+	pq.insert(0, in);
 
 	//primary search loop 
-	while (pq.size) { // queue is not empty
-		remove_min(&pq, &out);
+	while (!pq.is_empty()) { // queue is not empty
+		out = pq.remove_min();
 		current = out;
 		/*
 		int left = current - 1;
@@ -675,7 +710,7 @@ void Floor::update_dist(isTunneling t)
 					prev[n[i]] = current;
 					if (!visited[n[i]]) {
 						in = n[i];
-						insert(&pq, dist[n[i]], &in);
+						pq.insert(dist[n[i]], in);
 						visited[n[i]] = 1;
 					}
 				}
@@ -683,11 +718,11 @@ void Floor::update_dist(isTunneling t)
 		}
 	}
 	if (current == -1) {
-		throw "dijkstra_map() error : queue failure\n";
+		std::cout << "dijkstra_map() error : queue failure";
 	}
 
-	int mapiter;
 	int success;
+	int mapiter;
 	if (t == non_tunneling) {
 		for (mapiter = 0; mapiter < width * height; mapiter++) {
 			dist_map[mapiter] = dist[mapiter];
@@ -701,9 +736,12 @@ void Floor::update_dist(isTunneling t)
 		success = 0;
 	}
 	else {
-		success = 1;
+		std::cout << "dijkstra_map() error : invalid tunneling value";
 	}
-	delete_PQ(&pq);
+
+	if (success == 0) {
+		std::cout << "dijkstra_map() error : map modification error";
+	}
 }
 
 void Floor::print_floor()
@@ -718,8 +756,8 @@ void Floor::print_floor()
 	for (col = 0; col < height; col++) {
 		std::cout << "|";
 		for (row = 0; row < width; row++) {
-			if (index2d(row, col) == pc_loc) {
-				std::cout << "@";
+			if (char_map.at(index2d(row, col)) != NULL) {
+				std::cout << char_map.at(index2d(row, col))->symbol();
 			}
 			else {
 				switch (get_type(row, col)) {
@@ -735,12 +773,18 @@ void Floor::print_floor()
 				case(corridor_c):
 					std::cout << "#";
 					break;
+				case(stairs_up_c):
+					std::cout << "<";
+					break;
+				case(stairs_down_c):
+					std::cout << ">";
+					break;
 				default:
 					std::cout << "X"; //indicates an error
 				}
 			}
 		}
-		std::cout << std::endl;
+		std::cout << "|" << std::endl;
 	}
 	//bottom edge of border
 	for (dash = 0; dash < width + 2; dash++) {

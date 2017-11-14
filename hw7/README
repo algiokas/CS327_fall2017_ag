@@ -1,0 +1,9 @@
+Alex Giokas
+Com S 327 
+Homework 7 Readme
+
+- Monster description parsing should be fully working
+
+- I just modified my main method so that it parses, then prints monster descriptions and then returns
+  The rest of the code is still there, but unreachable
+  

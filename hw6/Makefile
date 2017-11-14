@@ -3,18 +3,16 @@ CXX = g++
 ECHO = echo
 RM = rm -f
 
-CFLAGS = -Wall -Werror -ggdb -funroll-loops
-CXXFLAGS = -Wall -Werror -ggdb -funroll-loops
+CFLAGS = -Wall -Werror -ggdb -funroll-loops -Wno-deprecated
+CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -std=c++11 -Wno-deprecated
 LDFLAGS = -lncurses
 
 BIN = ag327
-OBJS = ag327.o Character.o Floor.o io.o NPC.o PC.o
-
-all: $(BIN) etags
+OBJS = ag327.o Character.o Floor.o PC.o PQueue.o io.o
 
 $(BIN): $(OBJS)
 	@$(ECHO) Linking $@
-	@$(CC) $^ -o $@ $(LDFLAGS)
+	@$(CXX) $^ -o $@ $(LDFLAGS)
 
 -include $(OBJS:.o=.d)
 
