@@ -32,7 +32,7 @@ public:
 	}
 	~PC();
 	
-	void update_vision();
+	void update_vision(Floor *f);
 	bool can_see(int x, int y);
 	bool has_seen(int x, int y);
     void reset_vision();

@@ -678,7 +678,7 @@ void Floor::place_at_stairs(bool up)
 	this->char_map[stairs_idx] = char_map[pc_loc];
 	this->char_map[pc_loc] = NULL;
 	this->pc_loc = stairs_idx;
-	this->pc->update_vision();
+	this->pc->update_vision(this);
 }
 
 bool Floor::move_pc(direction d)
@@ -691,7 +691,7 @@ bool Floor::move_pc(direction d)
 		char_map[pc_loc] = NULL;
 		pc_loc = n[d];
 		pc->set_location(linearX(n[d]), linearY(n[d]));
-		pc->update_vision();
+		pc->update_vision(this);
 		update_dist(tunneling);
 		update_dist(non_tunneling);
 		return true;

@@ -66,8 +66,8 @@ bool Dungeon::change_floor_down()
 		this->floors.push_back(f);
 	}
     this->pc.reset_vision();
-    this->pc.update_vision();
 	this->active_floor++;
+	this->pc.update_vision(floors.at(active_floor));
 	generate_monsters();
 	return true;
 }
