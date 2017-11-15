@@ -12,20 +12,19 @@
 
 const int npc_vision_range = 15;
 
+struct pair;
+
 class NPC :
 	public Character
 {
 public:
-    NPC();
 	NPC(std::string name, char symbol, std::string description, int color,
 		int speed, unsigned long abilities, int hitpoints, Dice damage) :
-		Character(symbol, speed), 
+		Character(symbol, speed, hitpoints, damage), 
 		name(name), 
 		description(description),
         color(color),
-		ability(abilities), 
-        hitpoints(hitpoints), 
-        damage(damage) 
+		ability(abilities)
         {}
 	~NPC();
 
@@ -34,16 +33,12 @@ public:
 	inline int get_color() { return this->color; }
 	inline int get_speed() { return this->spd; }
 	inline bool check_ability(abilities_index a) { return this->ability.test(a); }
-	inline int get_hp() { return this->hitpoints; }
-	inline int roll_damage() { return this->damage.roll(); }
 
 private:
 	std::string name;
 	std::string description;
 	int color;
 	std::bitset<8> ability;
-	int hitpoints;
-	Dice damage;
 };
 
 #endif

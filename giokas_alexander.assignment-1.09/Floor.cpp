@@ -7,6 +7,7 @@
 #include <climits>
 #include <cmath>
 #include <arpa/inet.h>
+#include <algorithm>
 
 #include "PQueue.h"
 #include "Floor.h"
@@ -55,7 +56,7 @@ Floor::Floor(std::string filename)
 Floor::~Floor()
 {
 	for (Character *c : char_map) {
-		if (c && (c->x() != linearX(pc_loc) || c->y() != linearY(pc_loc))) {
+		if (c && (c->x_pos() != linearX(pc_loc) || c->y_pos() != linearY(pc_loc))) {
 			delete c;
 		}
 	}
@@ -156,38 +157,31 @@ std::array<int, 8> Floor::get_neighbors(int x, int y)
 	return n;
 }
 
-/*
 std::vector<int> Floor::bresenham_line(int start_x, int start_y, int end_x, int end_y)
 {
 	std::vector<int> line;
-
-
-	int dx = abs(end_x - start_x);
-	int dy = abs(end_y - start_y);
-	int diff = 2 * dy - dx;
+	
+	int dx = end_x - start_x;
+	int dy = end_y - start_y;
+	
+	int x_step = (end_x > start_x ? 1 : -1);
+	int y_step = (end_y > start_y ? 1 : -1);
+	
+	double m = std::abs((double)dx / dy);
 	int y = start_y;
+	double err = 0.0;
 
-	int x_inc = (start_x < end_x) ? 1 : -1;
-	int y_inc = (start_y < end_y) ? 1 : -1;
-
-	if (start_x == end_x) {
-		for (int i = 0; i < dy; i++) {
-			line.push_back(index2d(start_x, start_y + (y_inc * i)));
-		}
-	}
-
-	for (int x = start_x; x <= end_x; x++) {
-		std::cout << "Adding (" << x << ", " << y << ") to line" << std::endl;
+	for (int x = start_x; x != end_x; x += x_step) {
 		line.push_back(index2d(x, y));
-		if (diff > 0) {
-			y++;
-			diff -= 2 * dx;
+		err += m;
+		if (err >= 0.5) {
+			y += y_step;
+			err = err - 1.0;
 		}
-		diff += 2 * dy;
+
 	}
 	return line;
 }
-*/
 
 CType Floor::get_type(int x, int y)
 {
@@ -320,8 +314,10 @@ void Floor::gen_rooms()
 	while ((num_rooms < MINROOMS || (freespace / floorsize) > 1 - ROOMDENSITY)
 		&& num_rooms < MAXROOMS) {
 		//Rooms should never touch the edge
-		newRoom.loc.x = 1 + (rand() % (width - MINROOMWIDTH - 1));
-		newRoom.loc.y = 1 + (rand() % (height - MINROOMHEIGHT - 1));
+		newRoom.loc.x = 1 + (rand() 
+			% std::min((width - MINROOMWIDTH - 1), MAXROOMWIDTH));
+		newRoom.loc.y = 1 + (rand() 
+			% std::min((height - MINROOMHEIGHT - 1), MAXROOMHEIGHT));
 
 		int maxwidth = width - newRoom.loc.x - 1;
 		int maxheight = height - newRoom.loc.y - 1;
@@ -518,10 +514,10 @@ void Floor::add_corridors()
 		int bx = rooms[next].loc.x + (rooms[next].dims.x / 2);
 		int by = rooms[next].loc.y + (rooms[next].dims.y / 2);
 
-		int roomACentroid = index2d(ax, ay);
-		int roomBCentroid = index2d(bx, by);
+		//int roomACentroid = index2d(ax, ay);
+		//int roomBCentroid = index2d(bx, by);
 
-		std::vector<int> path = dijkstra_corridor(roomACentroid, roomBCentroid);
+		std::vector<int> path = bresenham_line(ax, bx, ay, by); //dijkstra_corridor(roomACentroid, roomBCentroid);
 		draw_path(path);
 	}
 }
@@ -643,11 +639,10 @@ void Floor::load_from_file(std::string filename)
 
 void Floor::spawn_pc(PC* player)
 {
-	std::cout << "Spawning player character at (" << player->x() << ", " << player->y() << ")..." << std::endl;
+	std::cout << "Spawning player character at (" << player->x_pos() << ", " << player->y_pos() << ")..." << std::endl;
 	this->pc = player;
-	this->pc_loc = index2d(player->x(), player->y());
+	this->pc_loc = index2d(player->x_pos(), player->y_pos());
 	this->char_map[pc_loc] = player;
-	this->pc->update_vision();
 }
 
 void Floor::place_at_stairs(bool up)
@@ -665,12 +660,13 @@ void Floor::place_at_stairs(bool up)
 			}
 		}
 	}
-	this->pc->move_to(stairs_loc.x, stairs_loc.y);
+	this->pc->set_location(stairs_loc.x, stairs_loc.y);
 
 	int stairs_idx = index2d(stairs_loc.x, stairs_loc.y);
 	this->char_map[stairs_idx] = char_map[pc_loc];
 	this->char_map[pc_loc] = NULL;
 	this->pc_loc = stairs_idx;
+	this->pc->update_vision();
 }
 
 bool Floor::move_pc(direction d)
@@ -682,7 +678,7 @@ bool Floor::move_pc(direction d)
 		char_map[n[d]] = pc;
 		char_map[pc_loc] = NULL;
 		pc_loc = n[d];
-		pc->move_to(linearX(n[d]), linearY(n[d]));
+		pc->set_location(linearX(n[d]), linearY(n[d]));
 		pc->update_vision();
 		update_dist(tunneling);
 		update_dist(non_tunneling);
@@ -857,7 +853,7 @@ void Floor::print_floor()
 		std::cout << "|";
 		for (row = 0; row < width; row++) {
 			if (char_map.at(index2d(row, col)) != NULL) {
-				std::cout << char_map.at(index2d(row, col))->symbol();
+				std::cout << char_map.at(index2d(row, col))->get_symbol();
 			}
 			else {
 				switch (get_type(row, col)) {

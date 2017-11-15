@@ -14,7 +14,9 @@ const int FHEIGHT = 21; //floor height
 const int MINROOMS = 5; //minimum rooms per floor as per assignment spec
 const int MAXROOMS = 15; //arbitrary upper bound 
 const int MINROOMWIDTH = 3; //minimum width of a room
+const int MAXROOMWIDTH = 12;
 const int MINROOMHEIGHT = 2; //minimum height of a room
+const int MAXROOMHEIGHT = 6;
 const double ROOMDENSITY = 0.12; //the fraction of the floor that must be rooms
 
 //File IO values
@@ -91,7 +93,7 @@ public:
 	~Floor();
 
 	static std::array<int, 8> get_neighbors(int x, int y);
-	//static std::vector<int> bresenham_line(int start_x, int start_y, int end_x, int end_y);
+	static std::vector<int> bresenham_line(int start_x, int start_y, int end_x, int end_y);
 
 	CType get_type(int x, int y);
 	int get_hardn(int x, int y);
@@ -162,8 +164,6 @@ private:
 
 	void load_from_file(std::string filename);
 
-	
-	//void gen_monsters();
 	//void check_visible(int pos_a, int pos_b);
 };
 

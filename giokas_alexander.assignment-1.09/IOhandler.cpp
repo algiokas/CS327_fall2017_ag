@@ -133,7 +133,7 @@ void IO_handler::display_dungeon()
 			}
 			else if ((c = d->get_character(x, y))) {
 				activate_color(((NPC *)c)->get_color());
-				mvaddch(y + 1, x, c->symbol());
+				mvaddch(y + 1, x, c->get_symbol());
 				deactivate_color(((NPC *)c)->get_color());
 			}
 			else if ((o = d->get_object(x, y))) {

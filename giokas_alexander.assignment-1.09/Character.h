@@ -2,32 +2,44 @@
 
 #define CHARACTER_H
 
+#include "Dice.h"
+#include "Floor.h"
+
 class Character
 {
 public:
 	Character() {}
-	Character(char sym, int x, int y, int spd, int sqnum);
+	Character(char symbol, int x, int y, int speed, int sqnum, int hitpoints, Dice damage) :
+		sym(symbol), spd(speed), seq_num(sqnum), hp(hitpoints), damage(damage)
+	{
+		this->position.x = x;
+		this->position.y = y;
+	}
 	virtual ~Character();
 
-	char symbol();
-	int x();
-	int y();
-	int speed();
-	bool is_alive();
-	int sequence_num();
-	void kill();
+	inline char get_symbol() { return this->sym; }
+	inline int x_pos() { return this->position.x; }
+	inline int y_pos() { return this->position.y; }
+	inline int speed() { return this->spd; }
+	inline int get_hp() { return this->hp; }
+	inline int sequence_num() { return this->seq_num; }
+
+	inline bool is_alive() { return (this->hp > 0); }
 
     void set_location(int x, int y);
+	virtual int roll_damage();
+	virtual void take_damage(int amount);
+
 
 protected:
-	Character(char symbol, int speed) :
-		sym(symbol), spd(speed) {}
+	Character(char symbol, int speed, int hp, Dice damage) :
+		sym(symbol), spd(speed), hp(hp), damage(damage) {}
 	char sym;
-	int x_pos;
-	int y_pos;
+	duo position;
 	int spd;
-	bool alive;
 	int seq_num;
+	int hp;
+	Dice damage;
 };
 
 #endif
