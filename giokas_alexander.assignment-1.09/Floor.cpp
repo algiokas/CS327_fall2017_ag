@@ -709,6 +709,19 @@ bool Floor::pc_has_seen(int x, int y)
 	return pc->has_seen(x, y);
 }
 
+bool Floor::can_see_pc(int x, int y)
+{
+    std::vector<int> sight_line
+        = bresenham_line(linearX(pc_loc), linearY(pc_loc), x, y);
+    for (int i : sight_line) {
+        cellType c = get_type(linearX(i), linearY(i));
+        if (c == rock_c) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Floor::save_to_file()
 {
 

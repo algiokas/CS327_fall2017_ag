@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <algorithm>
 
 PC::~PC()
 {
@@ -51,6 +52,7 @@ void PC::update_vision(Floor *f)
 				//if a single opaque cell is encountered, skip the rest of the iteration
 				for (int i : sight_line) {
 					cellType c = f->get_type(linearX(i), linearY(i));
+                    //check for any cell that blocks the sight line
 					if (c == rock_c || c == immutable_c) {
 						break;
 					}

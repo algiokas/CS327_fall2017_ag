@@ -117,6 +117,7 @@ public:
 	bool move_pc(direction d);
 	bool pc_can_see(int x, int y);
 	bool pc_has_seen(int x, int y);
+    bool can_see_pc(int x, int y);
 
 	bool place_character(int x, int y, Character *c);
 	bool place_object(int x, int y, Object *o);
@@ -135,7 +136,7 @@ private:
 	std::vector<struct room> rooms;
 
 	//maps in Floor are generally stored as linear, but external entities access and modify
-	//these maps as if they are 2D (mostly). The internal arithmetica of this conversion is handled mostly
+	//these maps as if they are 2D (mostly). The internal arithmetic of this conversion is handled mostly
 	//using the index2d, linearX, and linearY inline functions
 	std::array<CType, FWIDTH * FHEIGHT> type_map;
 	std::array<int, FWIDTH * FHEIGHT>  hard_map;

@@ -5,8 +5,6 @@
 #include "Character.h"
 #include "Floor.h"
 
-#include <cmath>
-
 const int pc_speed = 10;
 const int pc_vision_range = 3;
 const int pc_hitpoints = 100;
@@ -18,7 +16,7 @@ class PC : public Character
 public:
 	PC() : Character('@', pc_speed, pc_hitpoints, pc_base_damage)
 	{
-		this->vision_range = pow(pc_vision_range, 2);
+		this->vision_range = pc_vision_range;
 		current_vision.fill(false);
 		known_terrain.fill(false);
 	}
@@ -26,7 +24,7 @@ public:
 	PC(int x, int y) : Character('@', pc_speed, pc_hitpoints, pc_base_damage)
 	{
 		set_location(x, y);
-		this->vision_range = pow(pc_vision_range, 2);
+		this->vision_range = pc_vision_range;
 		current_vision.fill(false);
 		known_terrain.fill(false);
 	}

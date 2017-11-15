@@ -54,9 +54,6 @@ private:
 
 	void generate_monsters();
     void generate_objects();
-
-
-
 };
 
 #endif

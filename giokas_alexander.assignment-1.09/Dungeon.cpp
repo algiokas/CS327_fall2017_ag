@@ -1,6 +1,7 @@
 #include "Dungeon.h"
 #include "Floor.h"
 #include "Definitions.h"
+#include "PQueue.h"
 
 #include <iostream>
 
@@ -20,6 +21,8 @@ Dungeon::Dungeon()
 
     generate_monsters();
     generate_objects();
+
+
 }
 
 Dungeon::Dungeon(std::string filename)
