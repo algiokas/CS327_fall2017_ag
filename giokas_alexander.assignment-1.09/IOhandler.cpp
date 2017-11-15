@@ -125,7 +125,7 @@ void IO_handler::display_dungeon()
 			if ((visible = d->pc_can_see(x, y))) {
 				attron(A_BOLD);
 			}
-            if (!d->pc_has_seen(x, y)) {
+            if (1 == 0 && !d->pc_has_seen(x, y)) {
 				mvaddch(y + 1, x, ' ');
 			}
 			else if (pc_loc.x == x && pc_loc.y == y) {

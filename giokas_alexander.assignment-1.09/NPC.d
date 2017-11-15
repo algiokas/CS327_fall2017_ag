@@ -1,1 +1,1 @@
-NPC.o: NPC.cpp NPC.h Dice.h Character.h Definitions.h
+NPC.o: NPC.cpp NPC.h Dice.h Character.h Floor.h Definitions.h

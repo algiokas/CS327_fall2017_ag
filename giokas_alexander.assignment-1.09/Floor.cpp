@@ -314,13 +314,11 @@ void Floor::gen_rooms()
 	while ((num_rooms < MINROOMS || (freespace / floorsize) > 1 - ROOMDENSITY)
 		&& num_rooms < MAXROOMS) {
 		//Rooms should never touch the edge
-		newRoom.loc.x = 1 + (rand() 
-			% std::min((width - MINROOMWIDTH - 1), MAXROOMWIDTH));
-		newRoom.loc.y = 1 + (rand() 
-			% std::min((height - MINROOMHEIGHT - 1), MAXROOMHEIGHT));
+		newRoom.loc.x = 1 + (rand() % (width - MINROOMWIDTH - 1));
+		newRoom.loc.y = 1 + (rand() % (height - MINROOMHEIGHT - 1));
 
-		int maxwidth = width - newRoom.loc.x - 1;
-		int maxheight = height - newRoom.loc.y - 1;
+		int maxwidth = std::min(width - newRoom.loc.x - 1, MAXROOMWIDTH);
+		int maxheight = std::min(height - newRoom.loc.y - 1, MAXROOMHEIGHT);
 		if (maxwidth > MINROOMWIDTH) {
 			newRoom.dims.x = MINROOMWIDTH + (rand() % (maxwidth - MINROOMWIDTH));
 		}

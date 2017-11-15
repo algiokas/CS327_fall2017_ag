@@ -24,6 +24,7 @@ private:
 	int turn_number;
 	void activate_color(int color);
 	void deactivate_color(int color);
+
 	//std::queue<std::string> message_queue;
 
 	//void display_message_queue(int x, int y);
