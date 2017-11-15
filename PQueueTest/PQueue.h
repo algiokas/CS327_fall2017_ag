@@ -3,13 +3,15 @@
 #define PQUEUE_H
 
 #include <vector>
+#include <iostream>
 
 template <class T>
 class PQueue
 {
-	struct node {
-		int priority;
-		T data;
+	class node {
+        public:
+		    int priority;
+		    T data;
 	};
 
 public:
@@ -17,16 +19,41 @@ public:
 	~PQueue();
 
 	bool is_empty();
-	void insert(int prio, T data);
-	T remove_min();
-	T peek();
+	void insert(int prio, T data)
+    {
+        node new_node = node();
+        new_node.priority = prio;
+        new_node.data = data;
+        nodes.push_back(new_node);
+        percolate_up(size++);
+    }
+
+	T remove_min()
+    {
+        if (size < 1) {
+            std::cout << "empty queue";
+            return -1;
+        }
+        int value = nodes.front().data;
+        if (size > 1) {
+            nodes[0] = nodes.back();
+            nodes.pop_back();
+            percolate_down(0);
+        }
+        size--;
+        return value;
+    }
+    T peek()
+    {
+        return nodes.front().data;
+    }
 	void print_queue();
 
 private:
 
 
 	std::vector<node> nodes;
-	int size;
+	size_t size;
 
 	inline int parent(int idx) { return (idx - 1) / 2; }
 	inline int left_child(int idx) { return (2 * idx) + 1; }

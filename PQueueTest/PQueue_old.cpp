@@ -1,5 +1,7 @@
 #include "PQueue.h"
 
+#include <iostream>
+
 template<class T>
 PQueue<T>::~PQueue()
 {
@@ -10,6 +12,40 @@ template<class T>
 bool PQueue<T>::is_empty()
 {
 	return size == 0;
+}
+
+template<class T>
+void PQueue<T>::insert(int prio, T data)
+{
+	node new_node = node();
+	new_node.priority = prio;
+	new_node.data = data;
+	nodes.push_back(new_node);
+	//before incrementing the size member, the nodes vector has (size+1) elements, so size is in bounds here
+	percolate_up(size++);
+}
+
+template<class T>
+T PQueue<T>::remove_min()
+{
+	if (size < 1) {
+		std::cout << "empty queue";
+		return -1;
+	}
+	int value = nodes.front().data;
+	if (size > 1) {
+		nodes[0] = nodes.back();
+		nodes.pop_back();
+		percolate_down(0);
+	}
+	size--;
+	return value;
+}
+
+template<class T>
+T PQueue<T>::peek()
+{
+	return nodes.front().data;
 }
 
 template<class T>
