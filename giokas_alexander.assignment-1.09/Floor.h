@@ -14,9 +14,9 @@ const int FHEIGHT = 21; //floor height
 const int MINROOMS = 5; //minimum rooms per floor as per assignment spec
 const int MAXROOMS = 15; //arbitrary upper bound 
 const int MINROOMWIDTH = 3; //minimum width of a room
-const int MAXROOMWIDTH = 12;
+const int MAXROOMWIDTH = 20;
 const int MINROOMHEIGHT = 2; //minimum height of a room
-const int MAXROOMHEIGHT = 6;
+const int MAXROOMHEIGHT = 10;
 const double ROOMDENSITY = 0.12; //the fraction of the floor that must be rooms
 
 //File IO values

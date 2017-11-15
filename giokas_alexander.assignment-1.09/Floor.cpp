@@ -160,27 +160,41 @@ std::array<int, 8> Floor::get_neighbors(int x, int y)
 std::vector<int> Floor::bresenham_line(int start_x, int start_y, int end_x, int end_y)
 {
 	std::vector<int> line;
-	
-	int dx = end_x - start_x;
-	int dy = end_y - start_y;
-	
-	int x_step = (end_x > start_x ? 1 : -1);
-	int y_step = (end_y > start_y ? 1 : -1);
-	
-	double m = std::abs((double)dx / dy);
-	int y = start_y;
-	double err = 0.0;
 
-	for (int x = start_x; x != end_x; x += x_step) {
-		line.push_back(index2d(x, y));
-		err += m;
-		if (err >= 0.5) {
-			y += y_step;
-			err = err - 1.0;
-		}
+    const bool steep = (std::abs(end_y - start_y) > std::abs(end_x - start_x));
+    if (steep) {
+        std::swap(start_x, start_y);
+        std::swap(end_x, end_y);
+    }
 
-	}
-	return line;
+    if (start_x > end_x) {
+        std::swap(start_x, end_x);
+        std::swap(start_y, end_y);
+    }
+
+    const double dx = end_x - start_x;
+    const double dy = std::abs(end_y - start_y);
+
+    double error = (dx / 2.0);
+    const int y_step = (start_y < end_y) ? 1 : -1;
+    int y = start_y;
+
+    const int x_dest = end_x;
+
+    for (int x = start_x; x < x_dest; x++) {
+        if (steep) {
+            line.push_back(index2d(y, x));
+        } else {
+            line.push_back(index2d(x, y));
+        }
+        
+        error -= dy;
+        if (error < 0) {
+            y += y_step;
+            error += dx;
+        }
+    }
+    return line;
 }
 
 CType Floor::get_type(int x, int y)
@@ -512,10 +526,10 @@ void Floor::add_corridors()
 		int bx = rooms[next].loc.x + (rooms[next].dims.x / 2);
 		int by = rooms[next].loc.y + (rooms[next].dims.y / 2);
 
-		//int roomACentroid = index2d(ax, ay);
-		//int roomBCentroid = index2d(bx, by);
+		int roomACentroid = index2d(ax, ay);
+		int roomBCentroid = index2d(bx, by);
 
-		std::vector<int> path = bresenham_line(ax, bx, ay, by); //dijkstra_corridor(roomACentroid, roomBCentroid);
+		std::vector<int> path = dijkstra_corridor(roomACentroid, roomBCentroid);
 		draw_path(path);
 	}
 }
