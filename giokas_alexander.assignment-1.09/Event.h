@@ -4,7 +4,8 @@
 
 
 enum event_type {
-	event_character_turn,
+	event_npc_turn,
+	event_player_turn
 };
 
 class Character;
@@ -12,20 +13,11 @@ class Character;
 class Event
 {
 public:
-	Event();
+	Event(event_type type, Character *c) :
+		type(type), c(c) {}
 	~Event();
 
-	event_type get_type();
-	int get_time();
-	int get_sequence();
-	Character *get_character();
-
-	int compare_to(Event *other);
-
-private:
 	event_type type;
-	int time;
-	int sequence;
 	Character *c;
 };
 

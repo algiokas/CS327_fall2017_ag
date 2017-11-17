@@ -18,7 +18,7 @@ std::vector<std::string> colors = {
 };
 
 std::vector<std::string> item_types = {
-	"NO_TYPE", "WEAPON", "OFFHAND", "RANGED", "ARMOR", "HELMET", "CLOAK", "GLOVES", "BOOTS", "RING", "AMULET", "LIGHT", //EQUIPMENT IN THIS ROW
+	"NO_TYPE", "WEAPON", "OFFHAND", "RANGED", "ARMOR", "HELMET", "CLOAK", "GLOVES", "BOOTS", "AMULET", "LIGHT", "RING",  //EQUIPMENT IN THIS ROW
 	"SCROLL", "BOOK", "FLASK", "GOLD", "AMMUNITION", "FOOD", "WAND", "CONTAINER" //NON-EQUIPMENT IN THIS ROW
 };
 
@@ -27,13 +27,13 @@ extern const char object_symbol[] = {
 	'|', /* objtype_WEAPON */
 	')', /* objtype_OFFHAND */
 	'}', /* objtype_RANGED */
-	'~', /* objtype_LIGHT */
 	'[', /* objtype_ARMOR */
 	']', /* objtype_HELMET */
 	'(', /* objtype_CLOAK */
 	'{', /* objtype_GLOVES */
 	'\\', /* objtype_BOOTS */
 	'"', /* objtype_AMULET */
+	'~', /* objtype_LIGHT */
 	'=', /* objtype_RING */
 	'`', /* objtype_SCROLL */
 	'?', /* objtype_BOOK */
@@ -135,7 +135,7 @@ std::vector<Monster_definition> parse_all_monsters()
 				continue;
 			}
 			std::string temp_name = "";
-			for (unsigned int i = 0; i < current_tokens.size(); i++) {
+			for (unsigned int i = 1; i < current_tokens.size(); i++) {
 				temp_name.append(current_tokens.at(i));
 				if (i < current_tokens.size() - 1) {
 					temp_name.append(" ");
@@ -266,7 +266,6 @@ std::vector<Monster_definition> parse_all_monsters()
 
 		if (current_tokens.at(0).compare("END") == 0) {
 			if (current_tokens.size() == 1 && parameters.all()) {
-                std::cout << "Adding new monster def to list" << std::endl;
 				defs.push_back(temp);
 			}
 			is_entry = false;
@@ -284,6 +283,7 @@ std::vector<Monster_definition> parse_all_monsters()
 
 std::vector<Object_definition> parse_all_objects()
 {
+	std::cout << "Parsing object definitions..." << std::endl;
 	std::string fpath = std::string(std::getenv("HOME"));
 	if (fpath.empty()) {
 		fpath = ".";
@@ -359,7 +359,7 @@ std::vector<Object_definition> parse_all_objects()
 				continue;
 			}
 			std::string temp_name = "";
-			for (unsigned int i = 0; i < current_tokens.size(); i++) {
+			for (unsigned int i = 1; i < current_tokens.size(); i++) {
 				temp_name.append(current_tokens.at(i));
 				if (i < current_tokens.size() - 1) {
 					temp_name.append(" ");
@@ -558,7 +558,6 @@ std::vector<Object_definition> parse_all_objects()
 
 		if (current_tokens.at(0).compare("END") == 0) {
 			if (current_tokens.size() == 1 && parameters.all()) {
-                std::cout << "Parsed new Object definition..." << std::endl;
 				defs.push_back(temp);
 			}
 			is_entry = false;

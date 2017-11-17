@@ -4,24 +4,27 @@
 
 #include <vector>
 
-#include "PC.h"
+#include "Floor.h"
+#include "PQueue.h"
 
-class Floor;
+const std::string BOSS_NAME = "SpongeBob SquarePants";
+
 class Monster_definition;
 class Object_definition;
-
-enum direction;
-enum isTunneling;
+class NPC;
 
 class Dungeon
 {
 public:
-	Dungeon();
-	Dungeon(std::string filename);
-	~Dungeon();
+	static Dungeon *instance();
+	static void reset();
+
+	static void init();
+	static void init(std::string filename);
 
 	void spawn_pc();
 	bool move_pc(direction dir);
+	bool move_npc(NPC *npc, int next_location);
 	bool change_floor_down();
 	bool change_floor_up();
 
@@ -45,15 +48,41 @@ public:
 	bool pc_can_see(int x, int y);
 	bool pc_has_seen(int x, int y);
 
+	bool place_object(int x, int y, Object *obj);
+
+	int total_monsters();
+	void send_to_graveyard(Character *c);
+	Character *boss_ptr;
+
+	void add_event(int time, Character * c);
+	void clear_event_queue();
+
+	void game_turn();
+
 private:
-	PC pc;
+	static Dungeon *s_instance;
+
+	bool is_init;
+
+	Dungeon();
+	~Dungeon();
+
 	std::vector<Floor *> floors;
 	unsigned int active_floor;
 	std::vector<Monster_definition> monster_defs;
 	std::vector<Object_definition> object_defs;
 
+	std::vector<Character *> graveyard;
+
 	void generate_monsters();
     void generate_objects();
+
+	PQueue<Character *> event_queue;
+
+	void queue_monster_turns();
+	void queue_pc_turn();
+
+
 };
 
 #endif

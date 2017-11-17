@@ -5,40 +5,59 @@
 #include "Character.h"
 #include "Floor.h"
 
+enum equipment_slots {
+	WEAPON_SLOT, OFFHAND_SLOT, RANGED_SLOT, ARMOR_SLOT, HELMET_SLOT, CLOAK_SLOT, 
+	GLOVES_SLOT, BOOTS_SLOT, AMULET_SLOT, LIGHT_SLOT, RING_SLOT_A, RING_SLOT_B,
+	//add new equipment slots here
+	NUM_EQUIPMENT_SLOTS
+};
+
 const int pc_speed = 10;
 const int pc_vision_range = 3;
-const int pc_hitpoints = 100;
+const int pc_max_hitpoints = 100;
 const Dice pc_base_damage(0, 1, 4);
+const int pc_inventory_size = 10;
 
+class Object;
 
 class PC : public Character
 {
 public:
-	PC() : Character('@', pc_speed, pc_hitpoints, pc_base_damage)
-	{
-		this->vision_range = pc_vision_range;
-		current_vision.fill(false);
-		known_terrain.fill(false);
-	}
-
-	PC(int x, int y) : Character('@', pc_speed, pc_hitpoints, pc_base_damage)
-	{
-		set_location(x, y);
-		this->vision_range = pc_vision_range;
-		current_vision.fill(false);
-		known_terrain.fill(false);
-	}
-	~PC();
+	static PC *instance();
+	static void reset();
 	
 	void update_vision(Floor *f);
-	bool can_see(int x, int y);
-	bool has_seen(int x, int y);
-    void reset_vision();
+
+	unsigned int roll_damage() override;
+	void take_damage(int amount) override;
+	unsigned int get_speed() override;
+
+	void do_turn() override;
+
+	bool pick_up_object(Object * obj);
+	bool equip_object(int slot);
+	bool unequip_object(equipment_slots slot);
+	bool drop_item(int slot);
+	void expunge_item(int slot);
+	Object *inventory_object(int slot);
+	Object *equipped_item(equipment_slots slot);
+
+	void tgm();
 
 private:
-	std::array<bool, FWIDTH * FHEIGHT> current_vision;
-	std::array<bool, FWIDTH * FHEIGHT> known_terrain;
+	static PC *s_instance;
+
+	std::array<Object *, pc_inventory_size> inventory;
+	std::array<Object *, NUM_EQUIPMENT_SLOTS> equipment;
+
+	PC() : Character('@', pc_speed, pc_max_hitpoints, pc_base_damage)
+	{
+		this->vision_range = pc_vision_range;
+	}
+	~PC() {}
+
 	int vision_range;
+	bool god_mode;
 };
 
 #endif
