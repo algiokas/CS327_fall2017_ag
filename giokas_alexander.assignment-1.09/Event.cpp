@@ -1,12 +1,7 @@
 #include "Event.h"
-
-
-
-Event::Event()
-{
-}
-
+#include "Character.h"
 
 Event::~Event()
 {
 }
+

@@ -8,7 +8,7 @@
 class Character
 {
 public:
-	Character() {}
+	Character();
 	Character(char symbol, int x, int y, int speed, int sqnum, int hitpoints, Dice damage) :
 		sym(symbol), spd(speed), seq_num(sqnum), hp(hitpoints), damage(damage)
 	{
@@ -20,16 +20,18 @@ public:
 	inline char get_symbol() { return this->sym; }
 	inline int x_pos() { return this->position.x; }
 	inline int y_pos() { return this->position.y; }
-	inline int speed() { return this->spd; }
 	inline int get_hp() { return this->hp; }
 	inline int sequence_num() { return this->seq_num; }
 
 	inline bool is_alive() { return (this->hp > 0); }
 
     void set_location(int x, int y);
-	virtual int roll_damage();
-	virtual void take_damage(int amount);
 
+	virtual unsigned int roll_damage();
+	virtual void take_damage(int amount);
+	virtual unsigned int get_speed();
+
+	virtual void do_turn();
 
 protected:
 	Character(char symbol, int speed, int hp, Dice damage) :

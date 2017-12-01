@@ -50,15 +50,17 @@ struct duo {
 	int y;
 };
 
+//array indices correspond to direction enum values, so if n = get_neighbors(x, y);
+//then n[north] is the index of the dungeon cell in the northern direction
 enum direction {
+	northwest,
 	north,
 	northeast,
-	east,
-	southeast,
-	south,
-	southwest,
 	west,
-	northwest
+	east,
+	southwest,
+	south,
+	southeast
 };
 
 enum isTunneling {
@@ -103,6 +105,8 @@ public:
 	Object *get_object(int x, int y);
 	duo get_pc_location();
 
+	inline int get_num_monsters() { return this->num_monsters; }
+
 	int get_width();
 	int get_height();
 
@@ -114,13 +118,20 @@ public:
 
 	void spawn_pc(PC* player);
 	void place_at_stairs(bool up);
+	void kill_character(int index);
 	bool move_pc(direction d);
-	bool pc_can_see(int x, int y);
-	bool pc_has_seen(int x, int y);
     bool can_see_pc(int x, int y);
 
 	bool place_character(int x, int y, Character *c);
 	bool place_object(int x, int y, Object *o);
+
+	void view_cell(int i);
+	bool can_see(int x, int y);
+	bool has_seen(int x, int y);
+
+	void reset_current_vision();
+	void reset_vision();
+
 
 private:
 	int width;
@@ -131,11 +142,9 @@ private:
 	int max_monsters;
 	int time;
 
-	PC *pc;
-
 	std::vector<struct room> rooms;
 
-	//maps in Floor are generally stored as linear, but external entities access and modify
+	//maps in Floor are stored as linear, but external entities access and modify
 	//these maps as if they are 2D (mostly). The internal arithmetic of this conversion is handled mostly
 	//using the index2d, linearX, and linearY inline functions
 	std::array<CType, FWIDTH * FHEIGHT> type_map;
@@ -145,11 +154,13 @@ private:
 	std::array<Character *, FWIDTH * FHEIGHT> char_map;
 	std::array<Object *, FWIDTH * FHEIGHT> obj_map;
 
+	std::array<bool, FWIDTH * FHEIGHT> current_vision;
+	std::array<bool, FWIDTH * FHEIGHT> known_terrain;
+
 	void set_cell_type(int x, int y, CType input_type);
 	void set_cell_hardn(int x, int y, int input_hardn);
 	void set_cell_dist(int x, int y, int dist);
 	void set_cell_dist_tunnel(int x, int y, int dist);
-	
 
 	void empty_floor();
 	void place_room(struct room *r);
@@ -165,7 +176,7 @@ private:
 
 	void load_from_file(std::string filename);
 
-	//void check_visible(int pos_a, int pos_b);
+	void pc_combat(int index);
 };
 
 #endif

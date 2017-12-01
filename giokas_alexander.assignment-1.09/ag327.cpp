@@ -60,29 +60,33 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 	}
-	Dungeon *d;
+	Dungeon::instance();
+	PC::instance();
 	
 	if (load == 1) {
-		std::cout << "Loading Dungeon" << std::endl;
-		d = new Dungeon("dungeon");
+		Dungeon::init("dungeon");
 	}
 	else {
-		std::cout << "Generating new Dungeon" << std::endl;
-		d = new Dungeon();
+		Dungeon::init();
 	}
 
-	IO_handler io = IO_handler(d);
+	IO_handler::instance()->display_dungeon();
 
-	io.display_dungeon();
+	while (PC::instance()->is_alive() && 
+		Dungeon::instance()->boss_ptr &&
+		!IO_handler::instance()->quit_status()) {
 
-	while (!io.quit_status()) {
-		io.handle_input();
-		io.display_dungeon();
+		Dungeon::instance()->game_turn();
 	}
+	IO_handler::instance()->display_dungeon();
 
 	if (save) {
-		d->save_to_file();
+		Dungeon::instance()->save_to_file();
 	}
+
+	Dungeon::reset();
+	IO_handler::reset();
+	PC::reset();
 
 	return 0;
 }

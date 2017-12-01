@@ -140,8 +140,7 @@ void do_moves(dungeon_t *d)
     /* The next line is buggy.  Monsters get first turn before PC.  *
      * Monster gen code always leaves PC in a monster-free room, so *
      * not a big issue, but it needs a better solution.             */
-    e->time = d->time + (1000 / d->PC->speed)
-;
+    e->time = d->time + (1000 / d->PC->speed);
     e->sequence = 0;
     e->c = d->PC;
     heap_insert(&d->events, e);

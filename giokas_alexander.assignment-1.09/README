@@ -1,0 +1,34 @@
+Alex Giokas
+Com S 327 
+Homework 9 Readme
+
+- Basic combat is implemented, attacking an enemy will deal
+  damage based on the player's attacking die
+
+- AI is currently broken so monsters do not move, they can
+  be attacked and killed, but do not do anything
+  
+- Item pickup is implemented, as well as inventory and 
+  equipment viewing using 'i' and 'e' respectively
+  
+- Equipping/unequipping items works
+
+- Dropping and expunging items works. I don't have items
+  stacks implemented so when I drop an item it simply drops
+  in an open adjacent or diagonally adjacent space. When
+  the entire 3x3 grid around which the PC is standing is
+  filled with items, item dropping is disabled.
+  
+- Item inspection basically works, although it isn't very
+  nice to look at.
+  
+- For any of the above "menu functions", giving an input
+  that has no effect (such as trying to drop from an empty
+  slot) may not close the window immediately. However,
+  additional button presses will act as normal move commands
+  which may add a delay to the game state. In order to avoid this
+  generally use the 's' key to close any windows.
+  
+- Spongebob is not currently designated as a "boss" in any
+  way, so the game still just ends when 0 NPCs remain
+  

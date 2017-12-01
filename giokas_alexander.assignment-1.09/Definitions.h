@@ -25,7 +25,7 @@ enum abilities_index {
 };
 
 enum type_index {
-	NO_TYPE, WEAPON, OFFHAND, RANGED, ARMOR, HELMET, CLOAK, GLOVES, BOOTS, RING, AMULET, LIGHT, //EQUIPMENT IN THIS ROW
+	NO_TYPE, WEAPON, OFFHAND, RANGED, ARMOR, HELMET, CLOAK, GLOVES, BOOTS, AMULET, LIGHT, RING,  //EQUIPMENT IN THIS ROW
 	SCROLL, BOOK, FLASK, GOLD, AMMUNITION, FOOD, WAND, CONTAINER //NON-EQUIPMENT IN THIS ROW
 };
 
@@ -44,6 +44,8 @@ const std::string MONSTERS_FNAME = "monster_desc.txt";
 const std::string OBJECT_ENTRY_TOKEN = "BEGIN OBJECT";
 const std::string OBJECT_FILE_TOKEN = "RLG327 OBJECT DESCRIPTION 1";
 const std::string OBJECTS_FNAME = "object_desc.txt";
+
+std::vector<std::string> split(const std::string &s, char delim);
 
 class NPC;
 class Object;
@@ -72,6 +74,8 @@ public:
 
 	NPC *generate_NPC();
 	inline int num_generated() { return this->times_generated; }
+
+	
 
 private:
 	std::string name;

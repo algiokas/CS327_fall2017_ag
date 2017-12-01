@@ -15,14 +15,14 @@
 #include "PQueue.h"
 #include "PC.h"
 #include "Object.h"
+#include "IOhandler.h"
+#include "NPC.h"
 
-//array indices correspond to direction enum values, so if n = get_neighbors(x, y);
-//then n[north] is the index of the dungeon cell in the northern direction
 
 
 Floor::Floor()
 {
-	std::cout << "Constructing a Floor" << std::endl;
+	std::cout << "Generating a new floor..." << std::endl;
 	width = FWIDTH;
 	height = FHEIGHT;
 	num_rooms = 0;
@@ -35,6 +35,10 @@ Floor::Floor()
 	gen_rooms();
 	add_corridors();
 	add_stairs();
+
+	reset_vision();
+
+	std::cout << "Floor generation complete" << std::endl;
 }
 
 Floor::Floor(std::string filename)
@@ -51,6 +55,10 @@ Floor::Floor(std::string filename)
 
 	load_from_file(filename);
 	add_stairs();
+
+	reset_vision();
+
+	std::cout << "Floor loading complete" << std::endl;
 }
 
 Floor::~Floor()
@@ -112,6 +120,7 @@ bool Floor::place_character(int x, int y, Character * c)
 		std::cout << "Cell occupied" << std::endl;
 		return false;
 	}
+	c->set_location(x, y);
 	char_map[index2d(x, y)] = c;
 	return true;
 }
@@ -126,10 +135,42 @@ bool Floor::place_object(int x, int y, Object * o)
 		std::cout << "Cell occupied" << std::endl;
 		return false;
 	}
+	if (type_map[index2d(x, y)] == rock_c || type_map[index2d(x, y)] == immutable_c) {
+		return false;
+	}
 	obj_map[index2d(x, y)] = o;
 	return true;
 }
 
+void Floor::view_cell(int i)
+{
+	this->current_vision[i] = true;
+	this->known_terrain[i] = true;
+}
+
+bool Floor::can_see(int x, int y)
+{
+	return current_vision[index2d(x, y)];
+}
+
+bool Floor::has_seen(int x, int y)
+{
+	return known_terrain[index2d(x, y)];
+}
+
+void Floor::reset_current_vision()
+{
+	current_vision.fill(false);
+}
+
+void Floor::reset_vision()
+{
+	current_vision.fill(false);
+	known_terrain.fill(false);
+}
+
+//Returns an array of integer locations, each of which is a neighbor of the given
+//central index. The order of these neighbors corresponds to the direction enum defined in Floor.h
 std::array<int, 8> Floor::get_neighbors(int x, int y)
 {
 	int index = index2d(x, y);
@@ -145,14 +186,14 @@ std::array<int, 8> Floor::get_neighbors(int x, int y)
 
 	std::array<int, 8> n;
 
-	n[0] = top;
-	n[1] = topright;
-	n[2] = right;
-	n[3] = botright;
-	n[4] = bottom;
+	n[0] = topleft;
+	n[1] = top;
+	n[2] = topright;
+	n[3] = left;
+	n[4] = right;
 	n[5] = botleft;
-	n[6] = left;
-	n[7] = topleft;
+	n[6] = bottom;
+	n[7] = botright;
 
 	return n;
 }
@@ -181,7 +222,7 @@ std::vector<int> Floor::bresenham_line(int start_x, int start_y, int end_x, int 
 
     const int x_dest = end_x;
 
-    for (int x = start_x; x < x_dest; x++) {
+    for (int x = start_x; x <= x_dest; x++) {
         if (steep) {
             line.push_back(index2d(y, x));
         } else {
@@ -273,7 +314,6 @@ void Floor::empty_floor()
 
 void Floor::place_room(room * r)
 {
-	std::cout << "placing room..." << std::endl;
 	int x, y;
 	for (y = r->loc.y; y < r->loc.y + r->dims.y; y++) {
 		for (x = r->loc.x; x < r->loc.x + r->dims.x; x++) {
@@ -285,7 +325,6 @@ void Floor::place_room(room * r)
 
 bool Floor::check_intersection(room * r)
 {
-	std::cout << "checking intersection with " << num_rooms << " rooms..." << std::endl;
 	if (num_rooms == 0) {
 		return false;
 	}
@@ -348,7 +387,6 @@ void Floor::gen_rooms()
 		}
 
 		if (!check_intersection(&newRoom)) {
-			std::cout << "No Intersection" << std::endl;
 			rooms.push_back(newRoom);
 			num_rooms++;
 			place_room(&newRoom);
@@ -362,7 +400,6 @@ void Floor::gen_rooms()
 
 duo Floor::rand_room_location()
 {
-	std::cout << "Generating random room location..." << std::endl;
 	int r = rand() % num_rooms;
 
 	struct duo out;
@@ -381,13 +418,12 @@ inline int pf_weight(int hardness) {
 
 std::vector<int> Floor::dijkstra_corridor(int source, int target)
 {
-	std::cout << "calculating new corridor..." << std::endl;
 	std::array<int, FWIDTH * FHEIGHT> dist;
 	std::array<int, FWIDTH * FHEIGHT> prev;
 	std::array<bool, FWIDTH * FHEIGHT> visited;
 	std::vector<int> path;
 	
-	PQueue pq = PQueue();
+	PQueue<int> pq;
 
 	int current = -1;
 	int in;
@@ -492,7 +528,6 @@ std::vector<int> Floor::dijkstra_corridor(int source, int target)
 
 void Floor::draw_path(std::vector<int> path)
 {
-	std::cout << "drawing path from " << path.at(0) << " to " << path.at(path.size() -1) << std::endl;
 	if (path.empty()) {
 		std::cout << "invalid draw path";
 	}
@@ -501,13 +536,11 @@ void Floor::draw_path(std::vector<int> path)
 	for (i = 0; i < path.size(); i++) {
 		int pathx = (linearX(path[i]));
 		int pathy = (linearY(path[i]));
-		std::cout << get_type(pathx, pathy);
 		if (get_type(pathx, pathy) == rock_c) {
 			set_cell_type(pathx, pathy, corridor_c);
 			set_cell_hardn(pathx, pathy, 0);
 		}
 	}
-	std::cout << std::endl;
 }
 
 void Floor::add_corridors()
@@ -652,7 +685,6 @@ void Floor::load_from_file(std::string filename)
 void Floor::spawn_pc(PC* player)
 {
 	std::cout << "Spawning player character at (" << player->x_pos() << ", " << player->y_pos() << ")..." << std::endl;
-	this->pc = player;
 	this->pc_loc = index2d(player->x_pos(), player->y_pos());
 	this->char_map[pc_loc] = player;
 }
@@ -672,41 +704,73 @@ void Floor::place_at_stairs(bool up)
 			}
 		}
 	}
-	this->pc->set_location(stairs_loc.x, stairs_loc.y);
+	PC::instance()->set_location(stairs_loc.x, stairs_loc.y);
 
 	int stairs_idx = index2d(stairs_loc.x, stairs_loc.y);
 	this->char_map[stairs_idx] = char_map[pc_loc];
 	this->char_map[pc_loc] = NULL;
 	this->pc_loc = stairs_idx;
-	this->pc->update_vision(this);
+	PC::instance()->update_vision(this);
+}
+
+void Floor::kill_character(int index) 
+{
+	Character *deceased = char_map[index];
+	std::string kill_message = "You killed the ";
+	kill_message += ((NPC*)deceased)->get_name();
+
+	IO_handler::queue_message(kill_message);
+
+	
+	char_map[index] = NULL;
+	num_monsters--;
+}
+
+void Floor::pc_combat(int index) {
+	Character *target = char_map[index];
+	int outgoing_damage = PC::instance()->roll_damage();
+	target->take_damage(outgoing_damage);
+
+	std::string attack_message = "You attacked the ";
+	attack_message += ((NPC*)target)->get_name();
+	attack_message += ", Dealing ";
+	attack_message += std::to_string(outgoing_damage);
+	attack_message += " Damage - remaining HP: ";
+	attack_message += std::to_string(target->get_hp());
+
+	if (!target->is_alive()) {
+		kill_character(index);
+	}
+
+	IO_handler::queue_message(attack_message);
 }
 
 bool Floor::move_pc(direction d)
 {
 	std::array<int, 8> n = get_neighbors(linearX(pc_loc), linearY(pc_loc));
+	Character *target = char_map.at(n[d]);
+	if (target) {
+		pc_combat(n[d]);
+		return true;
+	}
 	CType next = type_map.at(n[d]);
 	if (next != rock_c && next != immutable_c) {
-		std::cout << "moved" << std::endl;
-		char_map[n[d]] = pc;
+		Object *obj = obj_map[n[d]];
+		if (obj) {
+			if (PC::instance()->pick_up_object(obj)) {
+				obj_map[n[d]] = NULL;
+			}
+		}
+		char_map[n[d]] = PC::instance();
 		char_map[pc_loc] = NULL;
 		pc_loc = n[d];
-		pc->set_location(linearX(n[d]), linearY(n[d]));
-		pc->update_vision(this);
+		PC::instance()->set_location(linearX(n[d]), linearY(n[d]));
+		PC::instance()->update_vision(this);
 		update_dist(tunneling);
 		update_dist(non_tunneling);
 		return true;
 	}
 	return false;
-}
-
-bool Floor::pc_can_see(int x, int y)
-{
-	return pc->can_see(x, y);
-}
-
-bool Floor::pc_has_seen(int x, int y)
-{
-	return pc->has_seen(x, y);
 }
 
 bool Floor::can_see_pc(int x, int y)
@@ -776,11 +840,10 @@ void Floor::save_to_file(std::string filename)
 
 void Floor::update_dist(isTunneling t)
 {
-	std::cout << "Updating distance map..." << std::endl;
 	std::array<int, FWIDTH * FHEIGHT> dist;
 	std::array<int, FWIDTH * FHEIGHT> prev;
 	std::array<bool, FWIDTH * FHEIGHT> visited;
-	PQueue pq = PQueue();
+	PQueue<int> pq;
 	int current = -1;
 	int in;
 	int out;
@@ -808,16 +871,6 @@ void Floor::update_dist(isTunneling t)
 	while (!pq.is_empty()) { // queue is not empty
 		out = pq.remove_min();
 		current = out;
-		/*
-		int left = current - 1;
-		int top = current - width;
-		int right = current + 1;
-		int bottom = current + width;
-		int topleft = top - 1;
-		int topright = top + 1;
-		int botright = bottom + 1;
-		int botleft = bottom - 1;
-		*/
 
 		//array of neighbors for iteration
 		std::array<int, 8> n = get_neighbors(linearX(current), linearY(current));
